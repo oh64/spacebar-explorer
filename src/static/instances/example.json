@@ -1,0 +1,19 @@
+{
+  "id": "",
+  "name": "",
+  "short": "",
+  "description": "",
+  "icon": "",
+  "images": [""],
+  "link": "",
+  "ping": "",
+  "location": {
+    "address": "",
+    "country": "",
+    "contact": ""
+  },
+  "tags": [""],
+  "level": 0,
+  "note": "",
+  "created_at": ""
+}

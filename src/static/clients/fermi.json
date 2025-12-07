@@ -1,0 +1,15 @@
+{
+  "id": "fermi",
+  "name": "Fermi",
+  "tags": ["recommended", "web", "open-source", "feature-rich"],
+  "short": "Fermi is a Spacebar-compatible client seeking to be as good as it can be with many features.",
+  "description": "Fermi is a Spacebar-compatible client seeking to be as good as it can be with many features including:\n\n* Direct Messaging\n* Reactions support\n* Invites\n* Account switching\n* User settings\n* Developer portal\n* Bot invites\n* Translation support\n",
+  "icon": "/static/fermi/fermi-icon.svg",
+  "images": [
+    "/static/fermi/1.png",
+    "/static/fermi/2.png",
+    "/static/fermi/3.png"
+  ],
+  "link": "https://fermi.chat/",
+  "status": 1
+}

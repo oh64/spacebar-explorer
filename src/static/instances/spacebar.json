@@ -1,0 +1,10 @@
+{
+  "id": "spacebar-chat",
+  "name": "spacebar.chat",
+  "tags": ["official", "stable"],
+  "short": "The official Spacebar instance.",
+  "description": "**spacebar.chat** is the official Spacebar instance.",
+  "icon": "/static/spacebar/icon.png",
+  "images": [],
+  "link": "https://spacebar.chat"
+}
