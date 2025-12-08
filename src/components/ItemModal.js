@@ -19,6 +19,7 @@ export default function ItemModal({
   
   const [pingHistory, setPingHistory] = useState([]);
   const [downtimeHistory, setDowntimeHistory] = useState([]);
+  const [pingGraph, setPingGraph] = useState(null);
 
   
   const mostRecent = pingHistory && pingHistory.length ? pingHistory[pingHistory.length - 1] : null;
@@ -35,9 +36,16 @@ export default function ItemModal({
 
   useEffect(() => {
     if (type === 'instance' && item.id) {
-      fetch(`/api/ping?instanceId=${encodeURIComponent(item.id)}&limit=48`)
+      fetch(`/api/ping?instanceId=${encodeURIComponent(item.id)}&limit=48&graph=1`)
         .then((r) => r.json())
-        .then((data) => { if (Array.isArray(data)) setPingHistory(data.reverse()); })
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setPingHistory(data.reverse());
+          } else if (data && Array.isArray(data.rows)) {
+            setPingHistory(data.rows.reverse());
+            if (data.graph) setPingGraph(data.graph);
+          }
+        })
         .catch(() => {});
       
       fetch(`/api/downtimes?instanceId=${encodeURIComponent(item.id)}&limit=50`)
@@ -48,6 +56,41 @@ export default function ItemModal({
   }, [type, item.id]);
 
   function renderPingChart() {
+    if (pingGraph && pingGraph.polyline) {
+      const width = pingGraph.width || 320;
+      const height = pingGraph.height || 60;
+      const last = (pingHistory && pingHistory.length) ? pingHistory[pingHistory.length - 1] : null;
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-[#cfcfe0]">Last: <span className="font-medium">{last?.status || 'N/A'}</span></div>
+            <div className="text-sm text-[#9ca3af]">Last successful: <span className="font-medium text-white">{lastSuccessfulMs != null ? `${lastSuccessfulMs} ms` : '—'}</span></div>
+          </div>
+          <svg width={width} height={height} className="bg-[#041025] rounded">
+            <polyline fill="none" stroke="#06b6d4" strokeWidth="2" points={pingGraph.polyline} />
+            { (pingGraph.points || []).map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r={p.status && (Number.isNaN(Number(p.status)) ? true : !(Number(p.status) >= 200 && Number(p.status) < 400)) ? 3 : 2} fill={p.color || '#f59e0b'} />
+            )) }
+          </svg>
+          <div className="mt-2">
+            <h5 className="text-sm text-[#cfcfe0] mb-2">Downtime history</h5>
+            {downtimeHistory && downtimeHistory.length > 0 ? (
+              <div className="flex flex-col gap-2 max-h-40 overflow-auto">
+                {downtimeHistory.map((d) => (
+                  <div key={d.id} className="flex items-center justify-between p-2 bg-[#031421] rounded">
+                    <div className="text-xs text-[#9ca3af]">{new Date(d.start_at).toLocaleString()} → {d.end_at ? new Date(d.end_at).toLocaleString() : 'ongoing'}</div>
+                    <div className="text-xs font-medium text-white">{d.duration_ms != null ? `${d.duration_ms} ms` : '—'}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-[#9ca3af]">No recorded downtimes.</div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     if (!pingHistory || pingHistory.length === 0) return <div className="text-xs text-[#9ca3af]">No ping history.</div>;
 
     

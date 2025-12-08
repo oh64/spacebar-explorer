@@ -10,8 +10,6 @@ export default function FilterBar({
   setSelectedIncludeTags,
   selectedExcludeTags,
   setSelectedExcludeTags,
-  itemSort,
-  setItemSort,
   showStatusFilter = true
 }) {
   return (

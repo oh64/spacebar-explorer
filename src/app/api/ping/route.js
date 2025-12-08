@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import sqlite from '@/lib/sqlite';
+import { computePingGraph } from '@/lib/graph';
 import dns from 'dns/promises';
 
 const RATE_WINDOW_MS = 60 * 1000;
@@ -51,10 +52,22 @@ export async function GET(request) {
     const url = new URL(request.url);
     const instanceId = url.searchParams.get('instanceId');
     const limit = clampLimit(url.searchParams.get('limit'), 48, 500);
+    const wantGraph = url.searchParams.get('graph');
     if (!instanceId) return NextResponse.json({ error: 'instanceId required' }, { status: 400 });
     if (!/^[\w-]{1,128}$/.test(instanceId)) return NextResponse.json({ error: 'invalid instanceId' }, { status: 400 });
 
     const rows = sqlite.all('SELECT * FROM instance_pings WHERE instance_id = ? ORDER BY created_at DESC LIMIT ?', [instanceId, limit]);
+    if (wantGraph) {
+      try {
+        const grows = sqlite.all('SELECT data FROM instance_ping_graphs WHERE instance_id = ? LIMIT 1', [instanceId]);
+        const graph = (grows && grows[0] && grows[0].data) ? JSON.parse(grows[0].data) : null;
+        const finalGraph = graph || computePingGraph(rows, { width: 320, height: 60 });
+        return NextResponse.json({ rows, graph: finalGraph });
+      } catch (e) {
+        return NextResponse.json({ rows, graph: null });
+      }
+    }
+
     return NextResponse.json(rows);
   } catch (err) {
     console.error('GET /api/ping error', err);
@@ -154,6 +167,14 @@ export async function POST(request) {
       sqlite.run('INSERT INTO instance_pings(instance_id, url, status, response_time_ms, body, created_at) VALUES (?, ?, ?, ?, ?, ?)', [instanceId, parsed.href, status, responseTime, String(responseBody).slice(0, 4096), new Date().toISOString()]);
     } catch (e) {
       console.error('db insert error', e && e.message ? e.message : e);
+    }
+
+    try {
+      const rows = sqlite.all('SELECT * FROM instance_pings WHERE instance_id = ? ORDER BY created_at DESC LIMIT ?', [instanceId, 48]);
+      const graph = computePingGraph(rows, { width: 320, height: 60 });
+      sqlite.run('INSERT OR REPLACE INTO instance_ping_graphs(instance_id, data, updated_at) VALUES (?, ?, ?)', [instanceId, JSON.stringify(graph), new Date().toISOString()]);
+    } catch (e) {
+      console.error('graph compute/store error', e && e.message ? e.message : e);
     }
 
     return NextResponse.json({ instanceId, status, responseTime });

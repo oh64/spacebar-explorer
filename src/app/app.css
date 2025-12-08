@@ -283,19 +283,27 @@ input:focus, textarea:focus {
   border: 1px solid rgba(124, 58, 237, 0.3);
 }
 
-/* Ensure markdown lists are visible and styled on dark background */
 .prose ul {
   margin: 0 0 1rem 1.25rem;
   color: #cfcfe0;
+  list-style: none;
+  padding: 0;
 }
 
 .prose ul li {
   margin-bottom: 0.5rem;
   line-height: 1.6;
+  position: relative;
+  padding-left: 1.25rem;
 }
 
-.prose ul li::marker {
+.prose ul li::before {
+  content: "-";
+  position: absolute;
+  left: 0;
+  top: 0.1rem;
   color: #9ca3af;
+  font-weight: 600;
 }
 
 .gradient-button {

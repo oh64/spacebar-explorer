@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { run as dbRun, all as dbAll } from '../src/lib/sqlite.js';
+import { computePingGraph } from '../src/lib/graph.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -69,6 +70,14 @@ async function main() {
         `INSERT INTO instance_pings (instance_id, url, status, response_time_ms, body, created_at) VALUES (?,?,?,?,?,?)`,
         [id, url, statusStr, result.time, bodyShort, createdAt]
       );
+
+      try {
+        const rows = dbAll(`SELECT * FROM instance_pings WHERE instance_id = ? ORDER BY created_at DESC LIMIT ?`, [id, 48]);
+        const graph = computePingGraph(rows, { width: 320, height: 60 });
+        dbRun(`INSERT OR REPLACE INTO instance_ping_graphs(instance_id, data, updated_at) VALUES (?,?,?)`, [id, JSON.stringify(graph), new Date().toISOString()]);
+      } catch (e) {
+        // non-fatal
+      }
 
       count++;
       const code = Number(result.status);

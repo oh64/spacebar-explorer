@@ -34,6 +34,16 @@ db.prepare(`
 
 db.prepare(`CREATE INDEX IF NOT EXISTS idx_downtimes_instance ON instance_downtimes(instance_id)`).run();
 
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS instance_ping_graphs (
+    instance_id TEXT PRIMARY KEY,
+    data TEXT,
+    updated_at TEXT
+  )
+`).run();
+
+db.prepare(`CREATE INDEX IF NOT EXISTS idx_ping_graphs_instance ON instance_ping_graphs(instance_id)`).run();
+
 export function run(sql, params = []) {
   const stmt = db.prepare(sql);
   return stmt.run(Array.isArray(params) ? params : [params]);
