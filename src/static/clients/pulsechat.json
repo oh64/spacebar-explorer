@@ -1,0 +1,18 @@
+{
+  "id": "pulsechat",
+  "name": "PulseChat",
+  "maintainer": "Rohit3523",
+  "maintainer_link": "https://github.com/Rohit3523",
+  "maintainer_image": "/static/pulsechat/rohit3523-avatar.png",
+  "tags": ["closed-source", "android"],
+  "short": "Unofficial mobile client for spacebar",
+  "description": "Unofficial mobile client for spacebar.\n\nSupport Server: https://fermi.chat/invite/YhQtqq?instance=https%3A%2F%2Fspacebar.chat",
+  "icon": "/static/pulsechat/pulsechat-icon.png",
+  "images": [
+    "/static/pulsechat/1.png",
+    "/static/pulsechat/2.png",
+    "/static/pulsechat/3.png"
+  ],
+  "link": "https://github.com/Rohit3523/pulse-apk/releases",
+  "status": 1
+}

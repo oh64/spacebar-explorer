@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import sqlite from '@/lib/sqlite';
 import { computePingGraph } from '@/lib/graph';
 import dns from 'dns/promises';
+import { corsHeaders } from '@/lib/cors';
 
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT = 60;
@@ -53,8 +54,8 @@ export async function GET(request) {
     const instanceId = url.searchParams.get('instanceId');
     const limit = clampLimit(url.searchParams.get('limit'), 48, 500);
     const wantGraph = url.searchParams.get('graph');
-    if (!instanceId) return NextResponse.json({ error: 'instanceId required' }, { status: 400 });
-    if (!/^[\w-]{1,128}$/.test(instanceId)) return NextResponse.json({ error: 'invalid instanceId' }, { status: 400 });
+  if (!instanceId) return NextResponse.json({ error: 'instanceId required' }, { status: 400, headers: corsHeaders() });
+  if (!/^[\w-]{1,128}$/.test(instanceId)) return NextResponse.json({ error: 'invalid instanceId' }, { status: 400, headers: corsHeaders() });
 
     const rows = sqlite.all('SELECT * FROM instance_pings WHERE instance_id = ? ORDER BY created_at DESC LIMIT ?', [instanceId, limit]);
     if (wantGraph) {
@@ -62,16 +63,16 @@ export async function GET(request) {
         const grows = sqlite.all('SELECT data FROM instance_ping_graphs WHERE instance_id = ? LIMIT 1', [instanceId]);
         const graph = (grows && grows[0] && grows[0].data) ? JSON.parse(grows[0].data) : null;
         const finalGraph = graph || computePingGraph(rows, { width: 320, height: 60 });
-        return NextResponse.json({ rows, graph: finalGraph });
+  return NextResponse.json({ rows, graph: finalGraph }, { headers: corsHeaders() });
       } catch (e) {
         return NextResponse.json({ rows, graph: null });
       }
     }
 
-    return NextResponse.json(rows);
+    return NextResponse.json(rows, { headers: corsHeaders() });
   } catch (err) {
     console.error('GET /api/ping error', err);
-    return NextResponse.json({ error: 'internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'internal error' }, { status: 500, headers: corsHeaders() });
   }
 }
 
@@ -126,12 +127,12 @@ export async function POST(request) {
     }
     entry.c += 1;
     rateMap.set(ip, entry);
-    if (entry.c > RATE_LIMIT) return NextResponse.json({ error: 'rate limit' }, { status: 429 });
+  if (entry.c > RATE_LIMIT) return NextResponse.json({ error: 'rate limit' }, { status: 429, headers: corsHeaders() });
 
     const body = await request.json();
     const { instanceId, url } = body || {};
-    if (!instanceId || !url) return NextResponse.json({ error: 'instanceId and url required' }, { status: 400 });
-    if (!/^[\w-]{1,128}$/.test(instanceId)) return NextResponse.json({ error: 'invalid instanceId' }, { status: 400 });
+  if (!instanceId || !url) return NextResponse.json({ error: 'instanceId and url required' }, { status: 400, headers: corsHeaders() });
+  if (!/^[\w-]{1,128}$/.test(instanceId)) return NextResponse.json({ error: 'invalid instanceId' }, { status: 400, headers: corsHeaders() });
 
     let parsed;
     try {
@@ -139,10 +140,10 @@ export async function POST(request) {
     } catch (e) {
       return NextResponse.json({ error: 'invalid url' }, { status: 400 });
     }
-    if (parsed.protocol !== 'https:') return NextResponse.json({ error: 'only https URLs are allowed' }, { status: 400 });
+  if (parsed.protocol !== 'https:') return NextResponse.json({ error: 'only https URLs are allowed' }, { status: 400, headers: corsHeaders() });
 
     const hostSafe = await isHostSafeForFetch(parsed.hostname);
-    if (!hostSafe) return NextResponse.json({ error: 'disallowed hostname' }, { status: 400 });
+  if (!hostSafe) return NextResponse.json({ error: 'disallowed hostname' }, { status: 400, headers: corsHeaders() });
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
@@ -177,9 +178,13 @@ export async function POST(request) {
       console.error('graph compute/store error', e && e.message ? e.message : e);
     }
 
-    return NextResponse.json({ instanceId, status, responseTime });
+    return NextResponse.json({ instanceId, status, responseTime }, { headers: corsHeaders() });
   } catch (err) {
     console.error('POST /api/ping error', err);
-    return NextResponse.json({ error: 'internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'internal error' }, { status: 500, headers: corsHeaders() });
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() });
 }

@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+
 export default function ImageGallery({ 
   item, 
   currentImageIndex,
@@ -9,6 +11,17 @@ export default function ImageGallery({
 }) {
   if (!item.images || item.images.length === 0) return null;
 
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setIsTouchDevice(('ontouchstart' in window) || (navigator.maxTouchPoints && navigator.maxTouchPoints > 0));
+    } catch (e) {
+      setIsTouchDevice(false);
+    }
+  }, []);
+
   return (
     <div className="mb-8">
       <h4 className="text-xl font-bold text-white mb-4">Screenshots</h4>
@@ -19,6 +32,11 @@ export default function ImageGallery({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onClick={() => {
+            if (isTouchDevice) {
+              setLightboxOpen(true);
+              setIsAutoPlaying(false);
+              return;
+            }
             if (item.images.length > 1) {
               setCurrentImageIndex((prev) => (prev + 1) % item.images.length);
               setIsAutoPlaying(false);
@@ -34,6 +52,22 @@ export default function ImageGallery({
             }}
           />
         </div>
+        {lightboxOpen && (
+          <div className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4" onClick={() => setLightboxOpen(false)}>
+            <button
+              onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}
+              aria-label="Close image"
+              title="Close"
+              style={{ position: 'fixed', top: '1rem', right: '1rem', left: 'auto' }}
+              className="z-60 inline-flex items-center justify-center w-11 h-11 rounded-full bg-white text-black shadow-xl border border-black/10 hover:scale-105 transition-transform"
+            >
+              <span className="text-2xl leading-none">×</span>
+            </button>
+            <div className="relative max-w-[95%] max-h-[95%]">
+              <img src={item.images[currentImageIndex]} alt={`expanded ${item.name}`} className="max-w-full max-h-[90vh] object-contain rounded" onClick={(e) => e.stopPropagation()} />
+            </div>
+          </div>
+        )}
         {item.images.length > 1 && (
           <div className="flex justify-center gap-2 mt-4">
             {item.images.map((_, idx) => (

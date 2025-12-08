@@ -1,4 +1,5 @@
 import { all as dbAll } from '../../../../src/lib/sqlite.js';
+import { corsHeaders, jsonWithCors } from '@/lib/cors';
 
 const RATE_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT = 60;
@@ -26,25 +27,29 @@ export async function GET(req) {
     if (now - entry.t > RATE_WINDOW_MS) { entry.t = now; entry.c = 0; }
     entry.c += 1;
     rateMap.set(ip, entry);
-    if (entry.c > RATE_LIMIT) return new Response(JSON.stringify({ error: 'rate limit' }), { status: 429 });
+  if (entry.c > RATE_LIMIT) return jsonWithCors({ error: 'rate limit' }, 429);
 
     const { searchParams } = new URL(req.url);
     const instanceId = searchParams.get('instanceId');
     const limit = clampLimit(searchParams.get('limit') || undefined, 50, 500);
     if (!instanceId) {
-      return new Response(JSON.stringify({ error: 'instanceId required' }), { status: 400 });
+      return jsonWithCors({ error: 'instanceId required' }, 400);
     }
     if (!/^[\w-]{1,128}$/.test(instanceId)) {
-      return new Response(JSON.stringify({ error: 'invalid instanceId' }), { status: 400 });
+      return jsonWithCors({ error: 'invalid instanceId' }, 400);
     }
 
     const rows = dbAll(
       `SELECT id, instance_id, start_at, end_at, duration_ms, created_at FROM instance_downtimes WHERE instance_id = ? ORDER BY start_at DESC LIMIT ?`,
       [instanceId, limit]
     );
-    return new Response(JSON.stringify(rows || []), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(rows || []), { status: 200, headers: corsHeaders({ 'Content-Type': 'application/json' }) });
   } catch (e) {
     console.error('GET /api/downtimes error', e);
-    return new Response(JSON.stringify({ error: 'internal error' }), { status: 500 });
+    return jsonWithCors({ error: 'internal error' }, 500);
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: corsHeaders() });
 }

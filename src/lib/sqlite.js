@@ -7,6 +7,12 @@ try { const dir = path.dirname(DB_FILE); if (!fs.existsSync(dir)) fs.mkdirSync(d
 
 const db = new Database(DB_FILE);
 
+try {
+  db.pragma('journal_mode = WAL');
+} catch (e) {
+  // Just in case
+}
+
 db.prepare(`
   CREATE TABLE IF NOT EXISTS instance_pings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

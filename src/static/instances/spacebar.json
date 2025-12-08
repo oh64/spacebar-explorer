@@ -6,5 +6,6 @@
   "description": "**spacebar.chat** is the official Spacebar instance.",
   "icon": "/static/spacebar/icon.png",
   "images": [],
+  "level": 5,
   "link": "https://spacebar.chat"
 }

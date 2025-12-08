@@ -1,0 +1,18 @@
+{
+  "id": "pax",
+  "name": "Pax",
+  "maintainer": "Sylvie",
+  "maintainer_link": "",
+  "maintainer_image": "/static/pax/Sylvie-avatar.jpeg",
+  "tags": ["open-source", "web", "impressive", "lightweight"],
+  "short": "placeholder",
+  "description": "placeholder",
+  "icon": "/static/pax/pax-icon.png",
+  "images": [
+    "/static/pax/"
+  ],
+  "invite_code": "fjzUo0",
+  "instance": "spacebar.chat",
+  "level": 1,
+  "status": 1
+}

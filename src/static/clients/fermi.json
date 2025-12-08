@@ -1,7 +1,10 @@
 {
   "id": "fermi",
   "name": "Fermi",
-  "tags": ["recommended", "web", "open-source", "feature-rich"],
+  "maintainer": "MathMan05",
+  "maintainer_link": "https://github.com/MathMan05",
+  "maintainer_image": "/static/fermi/MathMan05-avatar.png",
+  "tags": ["recommended", "open-source", "web", "feature-rich"],
   "short": "Fermi is a Spacebar-compatible client seeking to be as good as it can be with many features.",
   "description": "Fermi is a Spacebar-compatible client seeking to be as good as it can be with many features including:\n\n* Direct Messaging\n* Reactions support\n* Invites\n* Account switching\n* User settings\n* Developer portal\n* Bot invites\n* Translation support\n",
   "icon": "/static/fermi/fermi-icon.svg",
@@ -11,5 +14,6 @@
     "/static/fermi/3.png"
   ],
   "link": "https://fermi.chat/",
+  "level": 5,
   "status": 1
 }
