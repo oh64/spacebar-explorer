@@ -1,4 +1,7 @@
 # spacebar-explorer
+
+You can check it out on https://spacebar-explorer.sovr.top/
+
 A clean and modern Spacebar instance & client directory, built with Next.js.
 
 It provides simple search and review functionality.
