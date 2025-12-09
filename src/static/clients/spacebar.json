@@ -1,0 +1,16 @@
+{
+  "id": "spacebar",
+  "name": "Spacebar Client",
+  "maintainer": "Spacebar",
+  "maintainer_link": "https://github.com/spacebarchat",
+  "maintainer_image": "/static/spacebar/icon.png",
+  "note": "This client has not been maintained for two months, it isn't recommended to use it.",
+  "tags": ["official", "open-source"],
+  "short": "Open-source, themeable, and extensible, Discord-compatible native Spacebar client.",
+  "description": "Spacebar Client. This is a WIP React app.",
+  "icon": "/static/spacebar/icon.png",
+  "images": [],
+  "link": "https://github.com/spacebarchat/client",
+  "level": -5,
+  "status": 3
+}
