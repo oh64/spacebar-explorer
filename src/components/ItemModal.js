@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ImageGallery from './ImageGallery';
+import AccessPanel from './AccessPanel';
 
 export default function ItemModal({ 
   item, 
@@ -38,6 +39,32 @@ export default function ItemModal({
     return String(p.status).toUpperCase() === 'OK';
   }) || null;
   const lastSuccessfulMs = lastSuccessfulPing ? (lastSuccessfulPing.response_time_ms ?? lastSuccessfulPing.responseTime ?? null) : null;
+
+  const avgPing = (() => {
+    try {
+      if (!Array.isArray(pingHistory) || pingHistory.length === 0) return null;
+      const nums = pingHistory.map(p => Number(p.response_time_ms)).filter(n => !Number.isNaN(n));
+      if (nums.length === 0) return null;
+      const s = nums.reduce((a, b) => a + b, 0);
+      return Math.round(s / nums.length);
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  const dataSpanMs = (() => {
+    try {
+      if (!Array.isArray(pingHistory) || pingHistory.length === 0) return 0;
+      const first = pingHistory[0] && pingHistory[0].created_at ? Date.parse(pingHistory[0].created_at) : null;
+      const last = pingHistory[pingHistory.length - 1] && pingHistory[pingHistory.length - 1].created_at ? Date.parse(pingHistory[pingHistory.length - 1].created_at) : null;
+      if (!first || !last) return 0;
+      return Math.max(0, last - first);
+    } catch (e) {
+      return 0;
+    }
+  })();
+
+  const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
 
   useEffect(() => {
     if (type === 'instance' && item.id) {
@@ -102,6 +129,11 @@ export default function ItemModal({
     if (hasClosedSource) showBlurWarning = true;
   }
   const effectiveShowBlur = showBlurWarning && !dismissedWarning;
+
+  const downloadCode = item.download_code || item.downloadCode || item.invite_code || item.invite || item.invite_core || null;
+  const downloadInstance = item.download_instance || item.downloadInstance || item.instance || null;
+  const supportCode = item.support_code || item.supportCode || null;
+  const supportInstance = item.support_instance || item.supportInstance || item.instance || null;
 
   function renderPingChart() {
     if (pingGraph && pingGraph.polyline) {
@@ -255,7 +287,6 @@ export default function ItemModal({
   }
 
   return (
-    <>
       <div
         style={{
           position: 'fixed',
@@ -367,13 +398,23 @@ export default function ItemModal({
           {type === 'instance' && (
             <div className="mb-6 p-6 glass-effect rounded-xl">
               <h4 className="text-lg font-bold text-white mb-2">Instance health</h4>
-              <h2 className="text-red-500 mb-4">
-                This feature is not reliable yet and may not reflect reality.
-              </h2>
+              <div className="mb-2 text-sm text-[#cfcfe0]">
+                {dataSpanMs < TWO_DAYS_MS ? (
+                  <div className="text-red-500 mb-2">Not enough data for this instance yet. The values may be incorrect.</div>
+                ) : null}
+              </div>
               <div className="text-sm text-[#cfcfe0] mb-4">
-                      <div className="text-xs text-[#9ca3af]">Ping URL:</div>
-                      <div className="text-sm font-medium text-white truncate">{(item.ping || item.link || '').toString().slice(0, 200)}</div>
-                      {renderPingChart()}
+                <div className="text-xs text-[#9ca3af]">Ping URL:</div>
+                <div className="text-sm font-medium text-white truncate">{(item.ping || item.link || '').toString().slice(0, 200)}</div>
+                {renderPingChart()}
+                <div className="mt-3 flex gap-4 items-center text-sm">
+                  {avgPing != null && (
+                    <div className="text-xs text-[#9ca3af]">Average ping: <span className="font-medium text-white">{avgPing} ms</span></div>
+                  )}
+                  {lastSuccessfulMs != null && (
+                    <div className="text-xs text-[#9ca3af]">Last successful: <span className="font-medium text-white">{lastSuccessfulMs} ms</span></div>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -408,89 +449,38 @@ export default function ItemModal({
               )}
 
               <div className={`text-sm text-[#cfcfe0] mb-4 ${effectiveShowBlur ? 'max-h-14 overflow-hidden sm:max-h-none sm:overflow-auto' : ''}`} style={{ filter: effectiveShowBlur ? 'blur(6px) grayscale(60%)' : 'none', pointerEvents: effectiveShowBlur ? 'none' : 'auto' }}>
-                {type === 'client' ? (
-                  (item.invite_code || item.invite) ? (
-                    <div className="flex flex-col gap-2">
-                      <div>To download the client you need to join this guild using any Spacebar-compatible client with the invite code below:</div>
-                      <div className="flex flex-wrap gap-2 items-center">
-                        {(item.invite_code || item.invite) ? (
-                          <>
-                            <a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://fermi.chat/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent((selectedInstance && (selectedInstance.link || selectedInstance.id)) || item.instance || '')}`} target="_blank" rel="noreferrer">Open in Fermi</a>
-                            {/*<a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://hoshi.oh64.moe/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent((selectedInstance && (selectedInstance.link || selectedInstance.id)) || item.instance || '')}`} target="_blank" rel="noreferrer">Open in Hoshi</a>*/}
-                          </>
-                        ) : (
-                          <div>Invite code not provided</div>
-                        )}
-                      </div>
-                      <div className="text-xs text-[#9ca3af] mt-2">
-                        <div>Invite code: <span className="font-medium text-white">{item.invite_code || item.invite || item.invite_core || 'N/A'}</span></div>
-                        <div>Instance: <span className="font-medium text-white">{(selectedInstance && (selectedInstance.link || selectedInstance.id)) || item.instance || 'N/A'}</span></div>
-                      </div>
-                    </div>
-                  ) : item.type === 'by-guild' ? (
-                    <div>Join via guild: {item.link ? <a href={item.link} className="text-[#06b6d4] underline" target="_blank" rel="noreferrer">{item.link}</a> : 'link not provided'}</div>
-                  ) : item.type === 'spacebar' ? (
-                    <div className="flex flex-col gap-2">
-                      <div>Spacebar client, connect using an invite code and an instance.</div>
-                      {selectedInstance ? (
-                        <div className="flex flex-wrap gap-2 items-center">
-                          {(item.invite_code || item.invite) ? (
-                            <>
-                              <a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://fermi.chat/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent(selectedInstance.link || selectedInstance.id || '')}`} target="_blank" rel="noreferrer">Open in Fermi</a>
-                              {/*<a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://hoshi.oh64.moe/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent(selectedInstance.link || selectedInstance.id || '')}`} target="_blank" rel="noreferrer">Open in Hoshi</a>*/}
-                            </>
-                          ) : (
-                            <div>Invite code not provided, invite core: {item.invite_core || item.invite || 'N/A'}</div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#9ca3af]">Select an instance in the main view to generate instance-specific links. Invite: {item.invite_code || item.invite || item.invite_core || 'N/A'}</div>
-                      )}
-                    </div>
-                  ) : (
-                    item.link ? <div>Client: <a href={item.link} className="text-[#06b6d4] underline" target="_blank" rel="noreferrer">{item.link}</a></div> : <div>Instructions: {item.install || 'No install info'}</div>
-                  )
-                ) : type === 'guild' ? (
-                <div className="flex flex-col gap-2">
-                  <div>Join this guild using any Spacebar-compatible client with the invite code below:</div>
-                  <div className="flex flex-wrap gap-2 items-center">
-                    {(item.invite_code || item.invite) ? (
-                      <>
-                        <a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://fermi.chat/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent(item.instance || '')}`} target="_blank" rel="noreferrer">Open in Fermi</a>
-                        {/*<a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://hoshi.oh64.moe/invite/${item.invite_code || item.invite}?instance=${encodeURIComponent(item.instance || '')}`} target="_blank" rel="noreferrer">Open in Hoshi</a>*/}
-                      </>
-                    ) : (
-                      <div>Invite code not provided</div>
-                    )}
-                  </div>
-                  <div className="text-xs text-[#9ca3af] mt-2">
-                    <div>Invite code: <span className="font-medium text-white">{item.invite_code || item.invite || 'N/A'}</span></div>
-                    <div>Instance: <span className="font-medium text-white">{item.instance || 'N/A'}</span></div>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  Use any Spacebar-compatible client.
-                  <br />
-                  Instance link: {item.link ? (
-                    <span className="flex items-center gap-2">
-                      <span className="truncate max-w-88">{item.link}</span>
-                      <button
-                        type="button"
-                        onClick={() => copyToClipboard(item.link)}
-                        className="px-2 py-1 rounded bg-[#081226] border border-[#263047] text-xs text-[#cfcfe0] hover:bg-[#0f1620]"
-                      >
-                        {copiedText === item.link ? 'Copied' : 'Copy'}
-                      </button>
-                    </span>
-                  ) : (item.invite || item.id)}
-                </div>
-              )}
+                <AccessPanel
+                  type={type}
+                  item={item}
+                  downloadCode={downloadCode}
+                  downloadInstance={downloadInstance}
+                  supportCode={supportCode}
+                  supportInstance={supportInstance}
+                  selectedInstance={selectedInstance}
+                  copiedText={copiedText}
+                  copyToClipboard={copyToClipboard}
+                />
               </div>
             </div>
           </div>
-          </div>
+
+          {supportCode && (
+            <div className="mb-6 p-6 glass-effect rounded-xl">
+              <h4 className="text-lg font-bold text-white mb-2">Support server</h4>
+              <div className="flex flex-col gap-2">
+                <div>Join the support server using any Spacebar-compatible client with the invite code below:</div>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <a className="px-3 py-1 rounded bg-[#081226] border border-[#263047] text-sm text-[#cfcfe0]" href={`https://fermi.chat/invite/${supportCode}?instance=${encodeURIComponent(supportInstance || (selectedInstance && (selectedInstance.link || selectedInstance.id)) || '')}`} target="_blank" rel="noreferrer">Open in Fermi</a>
+                </div>
+                <div className="text-xs text-[#9ca3af] mt-2">
+                  <div>Invite code: <span className="font-medium text-white">{supportCode}</span></div>
+                  <div>Instance: <span className="font-medium text-white">{supportInstance || ((selectedInstance && (selectedInstance.link || selectedInstance.id)) || 'N/A')}</span></div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
-    </>
+      </div>
   );
 }

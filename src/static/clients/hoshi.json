@@ -6,7 +6,7 @@
   "maintainer_image": "https://oh64.moe/logo.jpg",
   "tags": ["closed-source", "web", "android", "ios", "windows", "linux", "macos", "cross-platform"],
   "short": "Hoshi is a Spacebar client built with Flutter and designed to be fully cross-platform ",
-  "description": "Hoshi is a cross-platform Spacebar client built with Flutter, currently in devlopment. Expect bugs.\n\nHoshi works on:\n\n* iOS\n* Android\n* Web\n* Windows\n* Linux\n* macOS\n\nThe web version will be available when the first release is out. You'll be able to try it on **[https://hoshi.oh64.moe](https://hoshi.oh64.moe)**.",
+  "description": "Hoshi is a cross-platform Spacebar client built with Flutter, currently in devlopment. Expect bugs.\n\nHoshi works on:\n\n* iOS\n* Android\n* Web\n* Windows\n* Linux\n* macOS\n\nThe web version will be available when the first release is out.",
   "icon": "/static/hoshi/hoshi-icon.png",
   "images": [
     "/static/hoshi/1.png",

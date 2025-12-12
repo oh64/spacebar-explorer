@@ -4,6 +4,8 @@
   "tags": ["official", "stable"],
   "short": "The official Spacebar instance.",
   "description": "**spacebar.chat** is the official Spacebar instance.",
+  "support_instance": "spacebar.chat",
+  "support_code": "KLfIIG",
   "icon": "/static/spacebar/icon.png",
   "images": [],
   "level": 5,
