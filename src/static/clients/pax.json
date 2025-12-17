@@ -17,5 +17,17 @@
   "support_code": "fjzUo0",
   "support_instance": "spacebar.chat",
   "level": 1,
-  "status": 2
+  "status": 2,
+  "versions": {
+    "1.1.6a": {
+      "url": "pax-1.1.6a.html",
+      "download_url": "pax-1.1.6a.html",
+      "changelog": "1.1.6a \"Hmm\" release on 16/12/25\n- supports token refreshing\n- fixed sitelen pona converter\n\nante nnn lon suno seli nanpa luka luka luka wan pi mun lete musi pi sike nanpa mute luka la\n- nasin pi nimi ilo sijelo sin li lon\n- ilo toki pi sitelen pona li pona sin"
+    },
+    "1.1.6": {
+      "url": "pax-1.1.6.html",
+      "download_url": "pax-1.1.6.html",
+      "changelog": "1.1.6 \"nice stuff again\" release on 15/12/25\n\n- Pax is under GNU General Public License v3.0 now\n- added unread channels and guilds\n- changed some toki pona\n- fixed language saving not working\n- fixed toki pona disappearing in the emojiSearch input\n- fixed user typing system\n- context menu's default behavior on the message bar is not prevented anymore\n- removed a feature that isn't implemented by some old browsers. Though, that will not matter much for most people\n- sending multi-line messages is now possible by using \\n\n    - pasting multi-line text should convert line breaks into \\n too\n    - message edit input supports that too\n    - I forgot that in the previous update you could use it in bio's\n- message edit input is now larger\n    - you can switch the message your currently editing more easily too\n\nante pi ijo pona sin lon suno seli luka tu tu pi mun lete musi pi sike mute luka la\n\n- sina wile kepeken e ilo Pa la o nasin e nasin pona ilo ni: ale la o toki e ni: meli Siwi li mama e ilo ni. ilo ni li wile ala e mani. jan ale li ken pana e ilo ni. jan ale li ken lukin e sijelo pi ilo ni. jan ale li ken ante e sijelo pi ilo ni. sina ante e ilo ni la o ante ala e nasin pona pi ilo ni.\n- sina sona ala e toki lon kulupu la sina ken sona e kulupu ni\n- mi ante e toki pona lili\n- ilo pi ante toki li pona sin\n- toki pona li pona sin lon ilo kipisi pi sitelen lili\n- ken suli la ilo pi \"jan li kama toki\" li pona sin\n- ilo pi ilo namako li ante ala lon poki pi pana toki\n- mi weka e ijo ilo ike tan ni: ona li ike a tawa ilo majuna pi lukin sona. taso, ni li ijo lili tawa jan mute\n- sina ken kipisi e linja toki sina kepeken nimi ilo \"\\n\"\n    - sina pana e toki tan ilo poki toki la nimi ilo \"\\n\" li lon kin\n    - ilo pi nimi ilo \"\\n\" li lon poki pi ante toki kin\n    - ante pini la sina ken kepeken e ni lon ilo \"sina la o toki\"\n- poki pi ante toki li suli\n    - sina ken ante e poki pi ante toki kin"
+    }
+  }
 }

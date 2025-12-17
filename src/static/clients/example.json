@@ -18,5 +18,13 @@
   "level": 0,
   "overwrite-warn": null,
   "note": "",
-  "created_at": ""
+  "created_at": "",
+  "versions": {
+    "changelog_link": "",
+    "1.0": {
+      "url": "",
+      "download_url": "",
+      "changelog": ""
+    }
+  }
 }

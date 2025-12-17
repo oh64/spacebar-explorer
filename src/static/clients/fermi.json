@@ -15,5 +15,8 @@
   ],
   "link": "https://fermi.chat/",
   "level": 5,
-  "status": 2
+  "status": 2,
+  "versions": {
+    "changelog_link": "https://blog.fermi.chat/blog/"
+  }
 }

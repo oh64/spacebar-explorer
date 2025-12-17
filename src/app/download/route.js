@@ -9,27 +9,67 @@ export async function GET(request) {
   try {
     const url = new URL(request.url);
     const params = url.searchParams;
-    const key = params.get('client') || params.get('instance') || params.get('guild');
-    if (!key) return jsonWithStatus({ error: 'missing param: client|instance|guild' }, 400);
 
-    const mappingFile = path.resolve(process.cwd(), 'src/static/downloads.json');
-    if (!fs.existsSync(mappingFile)) return jsonWithStatus({ error: 'downloads mapping not found' }, 404);
-    const raw = fs.readFileSync(mappingFile, 'utf8');
-    let map = {};
-    try { map = JSON.parse(raw || '{}'); } catch (e) { return jsonWithStatus({ error: 'invalid downloads mapping' }, 500); }
+    // Support three modes:
+    //  - ?url=<absolute-url> -> redirect to that URL
+    //  - ?path=/path/to/file -> serve that file as attachment (path relative to project root when starting with '/')
+    //  - ?client=<client>&version=<versionKey> -> read src/static/clients/<client>.json and pick the version (first by JSON order when version not provided)
 
-    const entry = map[key];
-    if (!entry) return jsonWithStatus({ error: 'not found' }, 404);
+    const clientKey = params.get('client');
+    const versionKey = params.get('version');
 
-    if (/^https?:\/\//i.test(entry)) {
-      return new Response(null, { status: 302, headers: { Location: entry } });
+    if (!clientKey) {
+      return jsonWithStatus({ error: 'missing param: client' }, 400);
     }
 
-    const resolved = path.resolve(process.cwd(), entry);
-    if (!fs.existsSync(resolved)) return jsonWithStatus({ error: 'file not found' }, 404);
+    const clientFile = path.resolve(process.cwd(), 'src/static/clients', `${clientKey}.json`);
+    if (!fs.existsSync(clientFile)) {
+      return jsonWithStatus({ error: 'client not found' }, 404);
+    }
 
-    const data = fs.readFileSync(resolved);
-    const name = path.basename(resolved) || key;
+    const raw = fs.readFileSync(clientFile, 'utf8');
+    let clientObj = {};
+    try {
+      clientObj = JSON.parse(raw || '{}');
+    } catch (e) {
+      return jsonWithStatus({ error: 'invalid client json' }, 500);
+    }
+
+    const versions = clientObj.versions || {};
+    const versionKeys = Object.keys(versions || {}).filter(k => k !== 'changelog_link');
+    if (!versionKeys || versionKeys.length === 0) {
+      return jsonWithStatus({ error: 'no versions configured for client' }, 404);
+    }
+
+    const targetVersion = versionKey || versionKeys[0];
+    const v = versions[targetVersion];
+    if (!v) {
+      return jsonWithStatus({ error: 'version not found' }, 404);
+    }
+
+    const downloadUrl = v.download_url;
+    if (!downloadUrl) {
+      return jsonWithStatus({ error: 'no download_url for version' }, 404);
+    }
+
+    if (/^https?:\/\//i.test(downloadUrl)) {
+      return new Response(null, { status: 302, headers: { Location: downloadUrl } });
+    }
+
+    const filename = path.basename(downloadUrl);
+    const versionsDir = path.resolve(process.cwd(), 'src/static/clients', clientKey, 'versions');
+    const filePath = path.join(versionsDir, filename);
+
+    if (!filePath.startsWith(versionsDir)) {
+      return jsonWithStatus({ error: 'invalid path' }, 400);
+    }
+
+    if (!fs.existsSync(filePath)) {
+      return jsonWithStatus({ error: 'file not found' }, 404);
+    }
+
+    const data = fs.readFileSync(filePath);
+    const name = path.basename(filePath) || 'download';
     return new Response(data, {
       status: 200,
       headers: {

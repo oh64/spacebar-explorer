@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import ImageGallery from './ImageGallery';
 import AccessPanel from './AccessPanel';
+import VersionsPanel from './VersionsPanel';
 
 export default function ItemModal({ 
   item, 
@@ -448,19 +449,37 @@ export default function ItemModal({
                 </div>
               )}
 
-              <div className={`text-sm text-[#cfcfe0] mb-4 ${effectiveShowBlur ? 'max-h-14 overflow-hidden sm:max-h-none sm:overflow-auto' : ''}`} style={{ filter: effectiveShowBlur ? 'blur(6px) grayscale(60%)' : 'none', pointerEvents: effectiveShowBlur ? 'none' : 'auto' }}>
-                <AccessPanel
-                  type={type}
-                  item={item}
-                  downloadCode={downloadCode}
-                  downloadInstance={downloadInstance}
-                  supportCode={supportCode}
-                  supportInstance={supportInstance}
-                  selectedInstance={selectedInstance}
-                  copiedText={copiedText}
-                  copyToClipboard={copyToClipboard}
-                />
-              </div>
+              {(() => {
+                const versionsObj = item.versions || {};
+                const versionsExist = Object.keys(versionsObj).filter(k => k !== 'changelog_link').length > 0;
+                const changelogLinkPresent = Boolean(versionsObj.changelog_link);
+                const hasAccessData = Boolean(downloadCode || item.direct_download || item.link || item.install || item.invite || item.invite_code || item.type === 'spacebar');
+                const showAccess = !(versionsExist && !hasAccessData);
+
+                return (
+                  <>
+                    {showAccess ? (
+                      <div className={`text-sm text-[#cfcfe0] mb-4 ${effectiveShowBlur ? 'max-h-14 overflow-hidden sm:max-h-none sm:overflow-auto' : ''}`} style={{ filter: effectiveShowBlur ? 'blur(6px) grayscale(60%)' : 'none', pointerEvents: effectiveShowBlur ? 'none' : 'auto' }}>
+                        <AccessPanel
+                          type={type}
+                          item={item}
+                          downloadCode={downloadCode}
+                          downloadInstance={downloadInstance}
+                          supportCode={supportCode}
+                          supportInstance={supportInstance}
+                          selectedInstance={selectedInstance}
+                          copiedText={copiedText}
+                          copyToClipboard={copyToClipboard}
+                        />
+                      </div>
+                    ) : null}
+
+                    {(versionsExist || changelogLinkPresent) ? (
+                      <VersionsPanel item={item} />
+                    ) : null}
+                  </>
+                );
+              })()}
             </div>
           </div>
 

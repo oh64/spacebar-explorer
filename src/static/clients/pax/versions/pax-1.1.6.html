@@ -1,0 +1,4433 @@
+<!--
+    GNU General Public License v3.0
+    Copyright (c) 2025 Sylvie
+    This software is free, any modifications must remain free.
+-->
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>Pax | 1.1.6</title>
+        <link rel="icon" type="image/x-icon" href="https://spacebar-explorer.sovr.top/static/pax/pax-icon.jpg">
+        <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/markdown-it-emoji/dist/markdown-it-emoji.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+        <script>
+            let english = {
+                lang: "toki pona",
+                login: "Email",
+                password: "Password",
+                postLogin: "Log in",
+                rememberme: "Remember me",
+                token: "Bot token",
+                sendToken: "Log in bot",
+                mobile: "Channels",
+                showPms: "Private messages",
+                invite: "Guild invite",
+                joinGuild: "Join guild",
+                message: "Type a message",
+                sendMessage: "Send",
+                file: "Upload a file",
+                file1: filename => [
+                    "Upload ",
+                    filename,
+                    ""
+                ],
+                file2: "Upload two files",
+                file3: "Upload a lot of files",
+                close: "Close",
+                save: "Save",
+                saveCreation: "Save",
+                logout: "Log out",
+                reply: (username, content) => [
+                    "Reply to ",
+                    username,
+                    ": ",
+                    content
+                ],
+                edited: " (edited)",
+                leave: "Leave",
+                guildSettings: "Guild settings",
+                guildName: "Name",
+                guildDelete: "Destroy guild",
+                guildDeleteLabel: "This button will delete this guild FOREVER. Are you aware of this guild's deletion?",
+                guildDeleteYes: "I am aware of this guild's deletion",
+                guildCreation: "Build a guild",
+                messageEditing: "Edit",
+                messageDelete: "Delete",
+                channelSettings: "Channel settings",
+                channelName: "Channel name",
+                channelDelete: "Delete channel",
+                channelDeleteLabel: "This button will delete this channel FOREVER. Are you aware of this channel's deletion?",
+                channelCreation: "Create channel",
+                addDm: "Message",
+                mention: "Mention",
+                userSettings: "Your settings",
+                username: "Username",
+                avatarEdit: "Change your profile picture",
+                avatarRemove: "Remove your profile picture",
+                avatarDontRemove: "Restore your profile picture",
+                pronouns: "Pronouns",
+                bio: "Bio",
+                wrongPassword: "Wrong password",
+                notification: (username, mention, channel) => [
+                    "",
+                    username,
+                    " sent a message",
+                    (mention ? " to you" : ""),
+                    ((channel.type !== 1) ? " in " : ""),
+                    ((channel.type !== 1) ? channel.name : ""),
+                    ""
+                ],
+                replyDeleted: "Replies to a deleted message",
+                replyUndefined: "Replies to: ",
+                replyMessage: (username, content) => [
+                    "",
+                    username,
+                    ": ",
+                    content
+                ],
+                replyRefresh: (username) => [
+                    "",
+                    username,
+                    ": "
+                ],
+                typingUser: (username) => [
+                    "",
+                    username,
+                    " and "
+                ],
+                typingUserEnd: (username, singular) => [
+                    "",
+                    username,
+                    ` ${singular ? "is" : "are"} typing...`
+                ],
+                typingUsers: "A lot of people are typing...",
+                emojiBoard: String.fromCodePoint(0x1FA77),
+                emojiEditing: "Edit emoji",
+                emojiDeleting: "Delete emoji",
+                emojiCreation: "Create emoji",
+                emojiName: "Emoji name",
+                emojiUpload: "Upload emoji",
+                emojiFavourite: "Favourite",
+                emojiUnfavourite: "Unfavourite",
+                emojiSearch: "Search for emojis",
+                inviteTitle: "You got invited to a guild",
+                error: "Error",
+                inviteInvalid: "Invalid guild invite",
+                websocketClose: "Disconnected, refresh Pax",
+                websocketError: "Error with the websocket connection:",
+                dmCreate: "You have a new private message",
+                you: "You"
+            };
+            let tokipona = {
+                lang: "english",
+                login: "nimi sina",
+                password: "sina taso sona e nimi ni",
+                postLogin: "o pana e nimi sina",
+                rememberme: "tenpo kama la o sona e mi",
+                token: "nimi pi ilo jan",
+                sendToken: "o pana e nimi pi ilo jan",
+                mobile: "kulupu",
+                showPms: "kulupu toki pi jan tu",
+                invite: "nimi pi kama kulupu",
+                joinGuild: "o tawa e kulupu",
+                message: "o toki",
+                sendMessage: "o pana e toki",
+                file: "o pana e lipu",
+                file1: filename => [
+                    "sina pana e lipu [",
+                    filename,
+                    "]"
+                ],
+                file2: "sina pana e lipu tu",
+                file3: "sina pana e lipu mute",
+                close: "o tawa",
+                save: "o pana e ante",
+                saveCreation: "o pana e pali",
+                logout: "o tawa",
+                reply: (username, content) => [
+                    "o toki tawa jan [",
+                    username,
+                    "]: ",
+                    content
+                ],
+                edited: " (toki li ante)",
+                leave: "o tawa",
+                guildSettings: "o ante e kulupu",
+                guildName: "nimi kulupu",
+                guildDelete: "o weka e kulupu",
+                guildDeleteLabel: "tenpo ale la nena kepeken ni li kama weka e kulupu ni. sina sona ala sona e ni?",
+                guildDeleteYes: "mi sona e weka kulupu ni",
+                guildCreation: "o pali e kulupu",
+                messageEditing: "o ante e toki",
+                messageDelete: "o weka e toki",
+                channelSettings: "o ante e kulupu toki",
+                channelName: "nimi pi kulupu toki",
+                channelDelete: "o weka e kulupu toki",
+                channelDeleteLabel: "tenpo ale la nena kepeken ni li kama weka e kulupu toki ni. sina sona ala sona e ni?",
+                channelCreation: "o pali e kulupu toki",
+                addDm: "o toki tawa ona",
+                mention: "o kama e ona",
+                userSettings: "o ante e sina",
+                username: "nimi sina",
+                avatarEdit: "o ante e sitelen lili sina",
+                avatarRemove: "o weka e sitelen lili sina",
+                avatarDontRemove: "o weka ala e sitelen lili sina",
+                pronouns: "toki [insa lipu] la sina seme",
+                bio: "sina la o toki",
+                wrongPassword: "nimi li pakala",
+                notification: (username, mention, channel) => [
+                    "jan [",
+                    username,
+                    "] li toki",
+                    (mention ? " tawa sina" : ""),
+                    ((channel.type !== 1) ? " lon kulupu toki [" : ""),
+                    ((channel.type !== 1) ? channel.name : ""),
+                    ((channel.type !== 1) ? "]" : "")
+                ],
+                replyDeleted: "toki li lon ala",
+                replyUndefined: "ona li toki tawa jan seme: ",
+                replyMessage: (username, content) => [
+                    "ona li toki tawa jan [",
+                    username,
+                    "]: ",
+                    content
+                ],
+                replyRefresh: (username) => [
+                    "ona li toki tawa jan [",
+                    username,
+                    "]: "
+                ],
+                typingUser: (username) => [
+                    "jan [",
+                    username,
+                    "] en "
+                ],
+                typingUserEnd: (username, singular) => [
+                    "jan [",
+                    username,
+                    "] li kama toki"
+                ],
+                typingUsers: "jan mute li kama toki",
+                emojiBoard: "sitelen lili",
+                emojiEditing: "o ante e sitelen lili",
+                emojiDeleting: "o weka e sitelen lili",
+                emojiCreation: "o pali e sitelen lili",
+                emojiName: "nimi pi sitelen lili",
+                emojiUpload: "o pana e sitelen lili",
+                emojiFavourite: "sitelen lili ni li pona a",
+                emojiUnfavourite: "sitelen lili ni li pona ala",
+                emojiSearch: "nimi la o kipisi e sitelen lili",
+                inviteTitle: "sina ken tawa kulupu ni tan wile ona",
+                error: "pakala",
+                inviteInvalid: "nimi kama li lon ala",
+                websocketClose: "toki li weka. o ante e lipu ni",
+                websocketError: "toki li pakala:",
+                dmCreate: "kulupu toki sin li lon tawa sina",
+                you: "sina"
+            };
+            let lang = tokipona;
+            let tokiponaala = false;
+
+            let token;
+            let sessionid;
+            let seq;
+            let messageToReply = "";
+            let channelid;
+            let place = null;
+
+            const base = "https://old.server.spacebar.chat/api";
+            const cdn = "https://cdn.old.server.spacebar.chat";
+            const gateway = "wss://gateway.old.server.spacebar.chat";
+            let user;
+            let typing = {};
+
+            const md = window.markdownit({
+                html: false,
+                linkify: true,
+                breaks: true
+            });
+
+            md.use(window.markdownitEmoji, {
+                shortcuts: {}
+            });
+
+            md.inline.ruler.push("sb_emoji", function(state, silent) {
+                let src = state.src.slice(state.pos);
+
+                let emojis = /^<a?:(\w+):(\d+)>/;
+                let match = src.match(emojis);
+                if (!match) return false;
+
+                if (!silent) {
+                    let token = state.push("sb_emoji", "", 0);
+
+                    token.meta = {
+                        full: match[0],
+                        id: match[2]
+                    }
+                }
+
+                state.pos += match[0].length;
+                return true;
+            });
+
+            md.renderer.rules.paragraph_open = () => "";
+            md.renderer.rules.paragraph_close = () => "";
+            md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
+                let token = tokens[idx];
+
+                let hrefIndex = token.attrIndex("href");
+                if (hrefIndex >= 0) {
+                    let hrefValue = token.attrs[hrefIndex][1];
+                    token.attrSet("data-fileurl", hrefValue);
+                    token.attrs.splice(hrefIndex, 1);
+                }
+                return self.renderToken(tokens, idx, options);
+            };
+
+            md.renderer.rules.sb_emoji = function(tokens, idx, options, env, self) {
+                let meta = tokens[idx].meta;
+
+                let anime = meta.full.startsWith("<a:");
+                return `<img class="emoji" src="${cdn}/emojis/${meta.id}.${anime ? "gif" : "png"}" alt="${meta.full}" draggable="false"/>`;
+            };
+
+            let profile = document.createElement("div");
+            profile.id = "profile";
+
+            let profileUser;
+            let profileAvatar = document.createElement("div");
+            profileAvatar.id = "profileAvatar";
+
+            let profileText = document.createElement("div");
+            profileText.id = "profileText";
+
+            let profileUsername = document.createElement("span");
+            profileUsername.style.fontSize = "30px";
+            profileUsername.id = "profileUsername";
+
+            let profileDiscriminator = document.createElement("span");
+            profileDiscriminator.id = "profileDiscriminator";
+
+            let br = document.createElement("br");
+            let profilePronouns = document.createElement("span");
+            profilePronouns.id = "profilePronouns";
+
+            let profileBio = document.createElement("div");
+            profileBio.id = "profileBio";
+
+            let buttonDm = document.createElement("button");
+            buttonDm.textContent = lang.addDm;
+            buttonDm.onclick = () => {
+                addDm(profileUser.id);
+            };
+
+            let buttonMention = document.createElement("button");
+            buttonMention.textContent = lang.mention;
+            buttonMention.onclick = () => {
+                mention(profileUser.id);
+            };
+
+            profile.appendChild(profileAvatar);
+            profileText.appendChild(profileUsername);
+            profileText.appendChild(profileDiscriminator);
+            profileText.appendChild(br);
+            profileText.appendChild(profilePronouns);
+            profileText.appendChild(profileBio);
+            profileText.appendChild(buttonDm);
+            profileText.appendChild(buttonMention);
+            profile.appendChild(profileText);
+
+            let contextmenu = document.createElement("div");
+            contextmenu.id = "contextmenu";
+
+            let root = {
+                "users": {
+                    "me": {
+                        "guilds": {
+
+                        },
+                        "channels": {
+
+                        },
+                        "member": {
+
+                        },
+                        "permissions": {
+
+                        }
+                    }
+                },
+                "guilds": {
+
+                },
+                "channels": {
+
+                }
+            };
+
+            let unread = [];
+            let lastRead = {};
+            let lastMessages = {};
+
+            async function cleanupStorage() {
+                Object.keys(lastRead).forEach(channel => {
+                    if (!Object.keys(root.users.me.channels).includes(channel)) {
+                        delete lastRead[channel];
+                    }
+                });
+                localStorage.setItem("lastRead", JSON.stringify(lastRead));
+                Object.keys(lastMessages).forEach(channel => {
+                    if (!Object.keys(root.users.me.channels).includes(channel)) {
+                        delete lastMessages[channel];
+                    }
+                });
+                localStorage.setItem("lastMessages", JSON.stringify(lastMessages));
+            }
+
+            let debug = false;
+            let shutdown = false;
+
+            document.addEventListener("keydown", (e) => {
+                if (e.ctrlKey && e.key === "s") {
+                    e.preventDefault();
+                    debug = !debug;
+                }
+
+                if (e.ctrlKey && e.key === "e") {
+                    e.preventDefault();
+                    shutdown = !shutdown;
+                }
+            });
+
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) {
+                    for (let notif of document.getElementById("notificationDiv").children) {
+                        setTimeout(() => {
+                            notif.remove();
+                        }, 15000);
+                    }
+                }
+            });
+
+            document.addEventListener("contextmenu", (event) => {
+                if (!document.getElementById("message").contains(event.target)) event.preventDefault();
+            });
+
+            let ws = new WebSocket(gateway);
+
+            ws.onopen = () => {
+            };
+
+            ws.onmessage = async (event) => {
+                const msg = JSON.parse(event.data);
+
+                if (msg.op === 10) {
+                    const interval = msg.d.heartbeat_interval;
+
+                    let heartbeat = () => {
+                        ws.send(JSON.stringify({
+                            op: 1,
+                            d: null
+                        }));
+                    };
+                    heartbeat();
+
+                    let heartbeatInterval = setInterval(heartbeat, interval * 0.95);
+
+                    if (token) {
+                        websocketToken();
+                    }
+                }
+
+                if (msg.op === 0) {
+                    switch (msg.t) {
+                        case "MESSAGE_UPDATE":
+                            if (root.channels[msg.d.channel_id].messages[msg.d.id]) {
+                                root.channels[msg.d.channel_id].messages[msg.d.id].edited_timestamp = "yes";
+                                msg.d.edited_timestamp = "yes";
+                                if (debug) notification([
+                                    {
+                                        content: (root.channels[msg.d.channel_id].messages[msg.d.id] === msg.d),
+                                        pona: false
+                                    }
+                                ]);
+                                if (root.channels[msg.d.channel_id].messages[msg.d.id] === msg.d) return;
+                            }
+
+                            root.channels[msg.d.channel_id].messages[msg.d.id] = msg.d;
+
+                            if (msg.d.channel_id === channelid) {
+                                addMessage(msg.d, true, false);
+                                let messages = Object.values(root.channels[channelid].messages);
+                                messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                                lastRead[msg.d.channel_id] = messages[0].id;
+                                localStorage.setItem("lastRead", JSON.stringify(lastRead));
+                                return;
+                            }
+
+                            unread.push(msg.d.channel_id);
+                            let element = document.getElementById("channels").querySelector(`[channel_id="${msg.d.channel_id}"]`);
+                            if (element) {
+                                element.classList.remove("read");
+                                element.classList.add("unread");
+                            }
+                            if (root.users.me.channels[msg.d.channel_id].type !== 1) {
+                                let element = document.getElementById("guilds").querySelector(`[guild_id="${root.users.me.channels[msg.d.channel_id].guild_id}"]`);
+                                if (element) {
+                                    element.classList.remove("read");
+                                    element.classList.add("unread");
+                                }
+                            }
+
+                            let notifDiv = document.getElementById("notificationDiv");
+                            let notif = document.createElement("div");
+                            notif.className = "notification";
+
+                            let title = document.createElement("span");
+
+                            let trad = lang.notification(msg.d.author.username, (msg.d.mentions.some(mentionUser => mentionUser.id === user.id) || root.users.me.channels[msg.d.channel_id].type === 1), root.users.me.channels[msg.d.channel_id]);
+
+                            let one = document.createElement("span");
+                            one.textContent = trad[0];
+
+                            let two = document.createElement("span");
+                            two.textContent = trad[1];
+
+                            let three = document.createElement("span");
+                            three.textContent = trad[2];
+                            three.textContent += trad[3];
+
+                            let four = document.createElement("span");
+                            let five = document.createElement("span");
+
+                            three.textContent += trad[4];
+                            four.textContent = trad[5];
+                            five.textContent = trad[6];
+
+                            if (!tokiponaala) {
+                                one.style.fontFamily = "nasinnanpa";
+                                three.style.fontFamily = "nasinnanpa";
+                                five.style.fontFamily = "nasinnanpa";
+                            }
+
+                            title.appendChild(one);
+                            title.appendChild(two);
+                            title.appendChild(three);
+                            title.appendChild(four);
+                            title.appendChild(five);
+                            title.style.fontFamily = "Tinos, 'JetBrains Mono', monospace, nasinnanpa";
+
+                            let body = document.createElement("span");
+                            let content = msg.d.content;
+
+                            if (content.length >= 100) {
+                                content = content.slice(0, 100) + '...';
+                            }
+
+                            body.textContent = content;
+                            notif.appendChild(title);
+                            notif.appendChild(document.createElement("br"));
+                            notif.appendChild(body);
+
+                            notif.setAttribute("channel_id", msg.d.channel_id);
+                            notif.onclick = () => {
+                                channelid = msg.d.channel_id;
+                                showMessages(msg.d.channel_id, null);
+                            };
+
+                            notifDiv.prepend(notif);
+                            if (notifDiv.childNodes.length > 4) {
+                                notifDiv.lastElementChild.remove();
+                            }
+
+                            if (!document.hidden) setTimeout(() => {
+                                notif.remove();
+                            }, 10000);
+                            break;
+                        case "READY":
+                            ready(msg);
+                            break;
+                        case "TYPING_START":
+                            if (debug) notification([{
+                                content: "event received",
+                                pona: false
+                            }]);
+                            if (msg.d.user_id !== user.id) {
+                                if (!typing[msg.d.channel_id]) typing[msg.d.channel_id] = {};
+                                //if (!typing[msg.d.channel_id][msg.d.user_id]) typing[msg.d.channel_id].push(msg.d.user_id);
+                                if (typing[msg.d.channel_id][msg.d.user_id]) clearTimeout(typing[msg.d.channel_id][msg.d.user_id]);
+                                if (debug) notification([{
+                                    content: "update should be executed",
+                                    pona: false
+                                }]);
+                                typing[msg.d.channel_id][msg.d.user_id] = setTimeout(() => {
+                                    if (debug) notification([{
+                                        content: "removing typing",
+                                        pona: false
+                                    }]);
+                                    delete typing[msg.d.channel_id][msg.d.user_id];
+                                    if (debug) notification([{
+                                        content: "removed typing",
+                                        pona: false
+                                    }]);
+                                    updateTyping();
+                                    //typing[msg.d.channel_id].splice(typing[msg.d.channel_id].indexOf(msg.d.user_id), 1);
+                                    //if (!typing[msg.d.channel_id].includes(msg.d.user_id)) updateTyping();
+                                }, 5010);
+                                updateTyping();
+                            }
+                            break;
+                        case "CHANNEL_CREATE":
+                            channelsetup:
+                            if (msg.d.type === 0 || msg.d.type === 5) {
+                                root.users.me.channels[msg.d.id] = msg.d;
+                                root.guilds[msg.d.guild_id].channels[msg.d.id] = msg.d;
+                                root.channels[msg.d.id] = {"messages": {}};
+                                permission_overwrites(msg.d, root.users.me.member[msg.d.guild_id].roles);
+                            } else if (msg.d.type === 1) {
+                                root.users.me.channels[msg.d.id] = msg.d;
+                                root.channels[msg.d.id] = {"messages": {}};
+                                if (msg.d.recipients.length === 0) {
+                                    root.users.me.channels[msg.d.id].name = lang.you;
+                                } else {
+                                    root.users.me.channels[msg.d.id].name = msg.d.recipients[0].username;
+                                }
+                            }
+                            if (place === "pms" && msg.d.type === 1) {
+                                showPms();
+                            } else if (place === msg.d.guild_id) {
+                                showChannels(place);
+                            } else if (msg.d.type === 1) {
+                                notification([
+                                    {
+                                        content: lang.dmCreate,
+                                        pona: !tokiponaala
+                                    }
+                                ]);
+                            }
+                            break;
+                        case "CHANNEL_UPDATE":
+                            if (msg.d.type === 0 || msg.d.type === 5) {
+                                if (msg.d.permission_overwrites !== root.users.me.channels[msg.d.id].permission_overwrites) {
+                                    permission_overwrites(msg.d, root.users.me.member[msg.d.guild_id].roles);
+                                }
+                                root.users.me.channels[msg.d.id] = Object.assign({}, root.users.me.channels[msg.d.id], msg.d);
+                                root.guilds[msg.d.guild_id].channels[msg.d.id] = Object.assign({}, root.guilds[msg.d.guild_id].channels[msg.d.id], msg.d);
+                            }
+                            if (place === msg.d.guild_id) {
+                                showChannels(place);
+                            }
+                            break;
+                        case "CHANNEL_DELETE":
+                            delete root.users.me.channels[msg.d.id];
+                            delete root.guilds[msg.d.guild_id].channels[msg.d.id];
+                            delete root.channels[msg.d.id];
+                            if (place === msg.d.guild_id) showChannels(place);
+                        case "READY_SUPPLEMENTAL":
+                            break;
+                        case "MESSAGE_CREATE":
+                            break;
+                        case "GUILD_CREATE":
+                            notification([
+                                {
+                                    content: JSON.stringify(msg.d),
+                                    pona: false
+                                }
+                            ]);
+                            root.users.me.guilds[msg.d.properties.id] = msg.d.properties;
+                            root.users.me.guilds[msg.d.properties.id].emojis = msg.d.emojis;
+                            root.guilds[msg.d.properties.id] = {"channels": {}};
+                            msg.d.channels.forEach((channel) => {
+                                root.guilds[msg.d.properties.id].channels[channel.id] = channel;
+                                root.channels[channel.id] = {"messages": {}}
+                            });
+                            showGuilds(Object.values(root.users.me.guilds));
+                            break;
+                        case "GUILD_UPDATE":
+                            if (debug) notification([
+                                {
+                                    content: JSON.stringify(msg.d),
+                                    pona: false
+                                }
+                            ]);
+                            root.users.me.guilds[msg.d.id] = Object.assign({}, root.users.me.guilds[msg.d.id], msg.d);
+                            showGuilds(Object.values(root.users.me.guilds));
+                            break;
+                        case "GUILD_DELETE":
+                            delete root.users.me.guilds[msg.d.id];
+                            delete root.guilds[msg.d.id];
+                            showGuilds(Object.values(root.users.me.guilds));
+                            break;
+                        case "GUILD_EMOJIS_UPDATE":
+                            delete root.users.me.guilds[msg.d.guild_id].emojis;
+                            root.users.me.guilds[msg.d.guild_id].emojis = msg.d.emojis;
+                            let emojiDiv = document.getElementById("emojiSettings");
+                            if (emojiDiv) {
+                                try {
+                                    emojiSettings(emojiDiv, msg.d.emojis, msg.d.guild_id);
+                                } catch (e) {
+                                    notification([
+                                        {
+                                            content: e,
+                                            pona: false
+                                        }
+                                    ]);
+                                }
+                            }
+                        case "PRESENCE_UPDATE":
+                            break;
+                        case "GUILD_MEMBER_ADD":
+                            break;
+                        case "MESSAGE_DELETE":
+                            messageList.querySelectorAll(`[message_reference="${msg.d.id}"]`).forEach(reply => {
+                                reply.children[0].textContent = lang.replyDeleted;
+                                reply.children[1].textContent = "";
+                                reply.children[2].textContent = "";
+                                reply.children[3].textContent = "";
+                            });
+                            if (root.channels[msg.d.channel_id].messages[msg.d.id]) {
+                                delete root.channels[msg.d.channel_id].messages[msg.d.id];
+                                let messageList = document.getElementById("messages");
+                                let message = messageList.querySelector(`[message_id="${msg.d.id}"]`);
+                                if (message) {
+                                    let messageAfter = message.nextElementSibling;
+                                    if (messageAfter) {
+                                        if (!message.classList.contains("grouped") && messageAfter.classList.contains("grouped")) {
+                                            message.remove();
+                                            addMessage(root.channels[msg.d.channel_id].messages[messageAfter.getAttribute("message_id")], null, false);
+                                        } else {
+                                            message.remove();
+                                        }
+                                    } else {
+                                        message.remove();
+                                    }
+                                }
+                            }
+                            break;
+                        case "USER_UPDATE":
+                            if (debug) notification([
+                                {
+                                    content: JSON.stringify(msg),
+                                    pona: false
+                                }
+                            ]);
+                            root.users[msg.d.id] = Object.assign({}, root.users[msg.d.id], msg.d);
+                            if (msg.d.id === user.id) user = Object.assign({}, user, msg.d);
+                            break;
+                        default:
+                            if (debug) notification([
+                                {
+                                    content: JSON.stringify(msg),
+                                    pona: false
+                                }
+                            ]);
+                            break;
+                    }
+                }
+            };
+
+            ws.onerror = (err) => {
+                notification([
+                    {
+                        content: lang.websocketError,
+                        pona: !tokiponaala
+                    },
+                    {
+                        content: err,
+                        pona: false
+                    }
+                ]);
+            };
+
+            ws.onclose = () => {
+                notification([
+                    {
+                        content: lang.websocketClose,
+                        pona: !tokiponaala
+                    }
+                ]);
+            };
+
+            function websocketToken () {
+                ws.send(JSON.stringify({
+                    op: 2,
+                    d: {
+                        "token": token,
+                        "properties": {
+                            "$os": "linux",
+                            "$browser": "chrome",
+                            "$device": "chrome"
+                        }
+                    }
+                }));
+            }
+
+            async function ready(msg) {
+                user = msg.d.user;
+                if (localStorage.getItem("lastRead")) {
+                    lastRead = JSON.parse(localStorage.getItem("lastRead"));
+                }
+                else localStorage.setItem("lastRead", JSON.stringify(lastRead));
+                if (localStorage.getItem("lastMessages")) {
+                    lastMessages = JSON.parse(localStorage.getItem("lastMessages"));
+                }
+                for (let guild of msg.d.guilds) {
+                    if (debug) notification([
+                        {
+                            content: JSON.stringify(guild),
+                            pona: false
+                        }
+                    ]);
+
+                    root.users.me.guilds[guild.id] = guild;
+                    root.guilds[guild.id] = {"channels": {}};
+
+                    await fetch(`${base}/guilds/${guild.id}/members/${user.id}`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": token,
+                            "Content-Type": "application/json"
+                        }
+                    }).then(response => response.json()).then(result => {
+                        root.users.me.member[guild.id] = result;
+                        root.users.me.permissions[guild.id] = BigInt(0);
+                        for (let guildRole of guild.roles) {
+                            if (result.roles.includes(guildRole.id)) {
+                                if ((BigInt(guildRole.permissions) & BigInt(8)) === BigInt(8)) {
+                                    root.users.me.permissions[guild.id] = BigInt(8);
+                                    break;
+                                }
+                                root.users.me.permissions[guild.id] = root.users.me.permissions[guild.id] | BigInt(guildRole.permissions);
+                            }
+                        }
+                        for (let channel of guild.channels) {
+                            permission_overwrites(channel, root.users.me.member[guild.id].roles);
+                        }
+                    }).catch(e => {
+                        notification([
+                            {
+                                content: e,
+                                pona: false
+                            }
+                        ]);
+                    });
+
+                    let unreadGuild = false;
+
+                    for (let channel of guild.channels) {
+                        if (!(guild.owner_id === user.id || (root.users.me.permissions[channel.id] & BigInt(8)) === BigInt(8) || ((root.users.me.permissions[channel.id] & BigInt(1024)) === BigInt(1024) && (root.users.me.permissions[channel.id] & BigInt(65536)) === BigInt(65536)))) continue;
+                        
+                        root.guilds[guild.id].channels[channel.id] = channel;
+                        root.channels[channel.id] = {"messages": {}};
+                        root.users.me.channels[channel.id] = channel;
+
+                        if (lastRead[channel.id] !== undefined) {
+                            if (lastMessages[channel.id] !== undefined) {
+                                if (lastMessages[channel.id] !== channel.last_message_id) delete lastMessages[channel.id];
+                            }
+                            if ((lastMessages[channel.id] === undefined) && (channel.last_message_id !== lastRead[channel.id])) {
+                                unreadGuild = true;
+                                unread.push(channel.id);
+                            }
+                        } else if (channel.type !== 4 && channel.type !== 2) {
+                            if (debug) notification([
+                                {
+                                    content: channel.name + " " + channel.type,
+                                    pona: false
+                                }
+                            ]);
+                            unreadGuild = true;
+                            unread.push(channel.id);
+                        }
+                    }
+
+                    localStorage.setItem("lastMessages", JSON.stringify(lastMessages));
+
+                    if (unreadGuild) unread.push(guild.id);
+                }
+                showGuilds(Object.values(root.users.me.guilds));
+                for (let channel of msg.d.private_channels) {
+                    root.users.me.channels[channel.id] = channel;
+                    root.channels[channel.id] = {"messages": {}};
+                    if (channel.recipients.length === 0) {
+                        root.users.me.channels[channel.id].name = lang.you;
+                    } else {
+                        root.users.me.channels[channel.id].name = channel.recipients[0].username;
+                    }
+
+                    if (lastRead[channel.id]) {
+                        if (debug) notification([
+                            {
+                                content: BigInt(channel.last_message_id) + "  " + BigInt(lastRead[channel.id]) + "  " + (BigInt(channel.last_message_id) > BigInt(lastRead[channel.id])),
+                                pona: false
+                            }
+                        ]);
+                        if (BigInt(channel.last_message_id) > BigInt(lastRead[channel.id])) {
+                            unread.push(channel.id);
+                        }
+                    } else {
+                        unread.push(channel.id);
+                    }
+                }
+                showPms();
+                cleanupStorage();
+            }
+
+            function mention(user_id) {
+                let message = document.getElementById("message");
+
+                message.value += `<@${user_id}>`
+            }
+
+            function permission_overwrites(channel, roles) {
+                if (root.users.me.permissions[channel.guild_id] === BigInt(8)) {
+                    root.users.me.permissions[channel.id] = BigInt(8);
+                    return;
+                }
+                root.users.me.permissions[channel.id] = root.users.me.permissions[channel.guild_id];
+                for (let permissionOverwrite of channel.permission_overwrites) {
+                    if (permissionOverwrite.type === 0) {
+                        if (roles.includes(permissionOverwrite.id)) {
+                            root.users.me.permissions[channel.id] = root.users.me.permissions[channel.id] | BigInt(permissionOverwrite.allow);
+                            root.users.me.permissions[channel.id] = root.users.me.permissions[channel.id] & ~BigInt(permissionOverwrite.deny);
+                        }
+                    } else {
+                        if (user.id === permissionOverwrite.id) {
+                            root.users.me.permissions[channel.id] = root.users.me.permissions[channel.id] | BigInt(permissionOverwrite.allow);
+                            root.users.me.permissions[channel.id] = root.users.me.permissions[channel.id] & ~BigInt(permissionOverwrite.deny);
+                        }
+                    }
+                }
+            }
+
+            function addDm(id) {
+                let body = {
+                    "recipients": [
+                        id
+                    ]
+                };
+
+                fetch(`${base}/users/@me/channels`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": token,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                }).catch(error => {
+                    notification([
+                        {
+                            content: error,
+                            pona: false
+                        }
+                    ]);
+                });
+            }
+
+            function updateTyping() {
+                if (debug) notification([{
+                    content: "in updateTyping",
+                    pona: false
+                }]);
+                let element = document.getElementById("typing");
+
+                if (!typing[channelid]) return;
+                let typingUsers = Object.keys(typing[channelid]);
+
+                element.innerHTML = "";
+                element.style.fontFamily = "unset";
+                if (debug) notification([{
+                    content: "before updateTyping's if statement",
+                    pona: false
+                }]);
+                if (typingUsers.length === 0) {
+                    return;
+                } else if (typingUsers.length <= 3) {
+                    for (let i=0;i<typingUsers.length-1;i++) {
+                        let trad = lang.typingUser(root.users[typingUsers[i]].username);
+
+                        let one = document.createElement("span");
+                        one.textContent += trad[0];
+                        if (!tokiponaala) one.style.fontFamily = "nasinnanpa";
+                        let two = document.createElement("span");
+                        two.textContent += trad[1];
+                        two.style.fontFamily = "Tinos, JetBrains Mono, monospace, nasinnanpa";
+                        let three = document.createElement("span");
+                        three.textContent += trad[2];
+                        if (!tokiponaala) three.style.fontFamily = "nasinnanpa";
+                        element.appendChild(one);
+                        element.appendChild(two);
+                        element.appendChild(three);
+                    }
+                    let trad = lang.typingUserEnd(root.users[typingUsers[typingUsers.length - 1]].username, typingUsers.length === 1);
+
+                    let one = document.createElement("span");
+                    one.textContent += trad[0];
+                    if (!tokiponaala) one.style.fontFamily = "nasinnanpa";
+                    let two = document.createElement("span");
+                    two.textContent += trad[1];
+                    two.style.fontFamily = "Tinos, JetBrains Mono, monospace, nasinnanpa";
+                    let three = document.createElement("span");
+                    three.textContent += trad[2];
+                    if (!tokiponaala) three.style.fontFamily = "nasinnanpa";
+                    element.appendChild(one);
+                    element.appendChild(two);
+                    element.appendChild(three);
+                } else {
+                    element.textContent = lang.typingUsers;
+                    if (!tokiponaala) element.style.fontFamily = "nasinnanpa";
+                }
+                element.appendChild(document.createElement("br"));
+                if (debug) notification([{
+                    content: "should be updated",
+                    pona: false
+                }]);
+            }
+
+            function notification(text) {
+                let notifDiv = document.getElementById("notificationDiv");
+                let notif = document.createElement("div");
+                notif.className = "notification";
+
+                for (let part of text) {
+                    let body = document.createElement("span");
+                    body.textContent = part.content;
+
+                    if (part.pona) body.style.fontFamily = "nasinnanpa";
+
+                    notif.appendChild(body);
+                }
+
+                notif.onclick = () => {
+                    notif.remove();
+                };
+
+                notifDiv.prepend(notif);
+
+                if (!document.hidden) setTimeout(() => {
+                    notif.remove();
+                }, 10000);
+            }
+
+            function postlogin (e) {
+                e.preventDefault();
+                if (debug) notification([{
+                    content: rememberme,
+                    pona: false
+                }]);
+
+                let login = document.getElementById("login").value.trim().toLowerCase();
+                let password = document.getElementById("password").value.trim();
+
+                const data = {
+                    login: login,
+                    password: password
+                };
+                fetch(base + "/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.code === 50035) {
+                            notification([
+                                {
+                                    content: lang.wrongPassword,
+                                    pona: !tokiponaala
+                                }
+                            ]);
+                        } else {
+                            if (rememberme) {
+                                localStorage.setItem("token", result.token);
+                            }
+                            localStorage.setItem("lang", (tokiponaala ? "en" : "tok"));
+                            start(result.token, false);
+                        }
+                    })
+                    .catch(error => {
+                        notification([
+                            {
+                                content: error,
+                                pona: false
+                            }
+                        ]);
+                    });
+            };
+
+            function startBot() {
+                let bot = document.getElementById("token").value;
+                start(bot, true);
+            }
+
+            function start(tokeen, bot) {
+                token = tokeen;
+                document.getElementById("loginDiv").style.display = "none";
+                document.getElementById("mainDiv").style.display = "flex";
+
+                if (bot) {
+                    refreshGuilds().then((guilds) => {
+                        for (let guild of guilds) {
+                            refreshChannels(guild.id);
+                        }
+                        showGuilds(guilds);
+                    });
+                    showPms();
+                }
+
+                websocketToken();
+
+                setTimeout(() => {
+                    if (Object.keys(root.users.me.guilds).length === 0) ;
+                });
+            }
+
+            async function refreshGuilds () {
+                let guilds = await fetch(base + "/users/@me/guilds", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": token
+                    }
+                })
+                    .then(response => response.json())
+                    .catch(error => {
+                        notification([
+                            {
+                                content: error,
+                                pona: false
+                            }
+                        ]);
+                    });
+
+                try {
+                    for (let guild of guilds) {
+                        root.users.me.guilds[guild.id] = guild;
+                        root.guilds[guild.id] = {"channels": {}};
+                    }
+                } catch (e) {
+                    notification([
+                        {
+                            content: e + " in refreshGuilds",
+                            pona: false
+                        }
+                    ]);
+                }
+
+                return guilds;
+            };
+
+            function showGuilds(guilds) {
+                guildList = document.getElementById("guilds");
+                guildList.innerHTML = "";
+
+                for (let guild of guilds) {
+                    if (debug) notification([
+                        {
+                            content: guild.name,
+                            pona: false
+                        }
+                    ]);
+                    //document.getElementById("messages").textContent = JSON.stringify(guild);
+                    let guildElement = document.createElement("div");
+                    guildElement.onclick = () => {
+                        showChannels(guild.id);
+                    };
+                    let guildSpan = document.createElement("span");
+                    guildSpan.oncontextmenu = guildContextMenu;
+                    guildSpan.setAttribute("guild_id", guild.id);
+                    guildSpan.textContent = guild.name;
+                    if (unread.includes(guild.id)) guildSpan.classList.add("unread");
+                    else guildSpan.classList.add("read");
+                    guildElement.appendChild(guildSpan);
+                    guildList.appendChild(guildElement);
+                }
+                return guilds;
+            }
+
+            async function refreshChannels (guildid) {
+                await fetch(`${base}/guilds/${guildid}/channels`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": token
+                    }
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        try {
+                            for (let channel of result) {
+                                if (channel.type === 0 || channel.type === 5) {
+                                    root.users.me.channels[channel.id] = channel;
+                                    root.guilds[guildid].channels[channel.id] = channel;
+                                    root.channels[channel.id] = {"messages": {}};
+                                }
+                            }
+                        } catch (e) {
+                            notification([
+                                {
+                                    content: e + " in refreshChannels",
+                                    pona: false
+                                }
+                            ]);
+                        }
+                    })
+                    .catch(error => {
+                        notification([
+                            {
+                                content: error,
+                                pona: false
+                            }
+                        ]);
+                    });
+            };
+
+            async function showChannels (guildid) {
+                place = guildid;
+
+                if (Object.values(root.guilds[guildid].channels).length === 0) {
+                    await refreshChannels(guildid);
+                }
+
+                channelList = document.getElementById("channels");
+                channelList.innerHTML = "";
+
+                for (let channel of Object.values(root.guilds[guildid].channels)) {
+                    if (channel.type === 0 || channel.type === 5) {
+                        let channelElement = document.createElement("div");
+                        channelElement.onclick = () => {
+                            channelid = channel.id;
+                            showMessages(channel.id, null);
+                        };
+                        let channelSpan = document.createElement("span");
+                        channelSpan.className = "channelSpan";
+                        channelSpan.oncontextmenu = channelContextMenu;
+                        channelSpan.setAttribute("channel_id", channel.id);
+                        channelSpan.textContent = channel.name;
+                        if (unread.includes(channel.id)) channelSpan.classList.add("unread");
+                        else channelSpan.classList.add("read");
+                        channelElement.appendChild(channelSpan);
+                        channelList.appendChild(channelElement);
+                    }
+                }
+            }
+
+            async function refreshPms () {
+                let response = await fetch(`${base}/users/@me/channels`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": token
+                    }
+                });
+                let result = await response.json();
+                channelList = document.getElementById("channels");
+                channelList.innerHTML = "";
+
+                try {
+                    for (let channel of result) {
+                        if (channel.type === 1) {
+                            root.users.me.channels[channel.id] = channel;
+                            root.channels[channel.id] = {"messages": {}};
+                            if (channel.recipients.length === 0) {
+                                root.users.me.channels[channel.id].name = lang.you;
+                            }
+                            else {
+                                root.users.me.channels[channel.id].name = channel.recipients[0].username;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    notification([
+                        {
+                            content: e + " in refreshPms " + result,
+                            pona: false
+                        }
+                    ]);
+                }
+
+                return result;
+            };
+
+            async function showPms () {
+                place = "pms";
+                let result;
+                if (Object.keys(root.users.me.channels).length === 0) {
+                    result = await refreshPms();
+                } else {
+                    result = Object.values(root.users.me.channels);
+                }
+
+                channelList = document.getElementById("channels");
+                channelList.innerHTML = "";
+
+                for (let channel of result) {
+                    if (channel.type == 1) {
+                        let channelElement = document.createElement("div");
+                        channelElement.id = channel.id;
+                        channelElement.onclick = () => {
+                            channelid = channel.id;
+                            showMessages(channel.id, null);
+                        };
+                        let channelSpan = document.createElement("span");
+                        channelSpan.setAttribute("channel_id", channel.id);
+                        channelSpan.textContent = channel.name;
+                        if (unread.includes(channel.id)) channelSpan.classList.add("unread");
+                        else channelSpan.classList.add("read");
+                        channelElement.appendChild(channelSpan);
+                        channelList.appendChild(channelElement);
+                    }
+                }
+            }
+
+            function closeOnClick(e) {
+                let div = document.getElementById("imagePopup");
+                let profile = document.getElementById("profile");
+                let emojiBoard = document.getElementById("emojiBoard");
+                let emojiSearch = document.getElementById("emojiSearch");
+
+                if (!div.contains(e.target)) {
+                    div.style.display = "none";
+                }
+
+                if (!contextmenu.contains(e.target)) {
+                    contextmenu.remove();
+                }
+
+                if (!emojiBoard.contains(e.target)) {
+                    emojiBoard.style.display = "none";
+                    emojiSearch.value = "";
+                }
+
+                if ((!profile.contains(e.target)) && (e.target.className !== "author")) {
+                    profile.remove();
+                }
+            }
+            document.addEventListener("click", closeOnClick);
+
+            function createImageEmbed (url) {
+                let img = document.createElement("img");
+                img.src = url;
+                img.style.maxWidth = "70%";
+                img.style.maxHeight = "400px";
+                img.loading = "lazy";
+                img.onclick = function (event) {
+                    event.stopPropagation();
+                    profile.remove();
+                    contextmenu.remove();
+                    let popup = document.createElement("img");
+                    popup.src = event.target.src;
+                    let div = document.getElementById("imagePopup");
+                    div.innerHTML = "";
+                    div.appendChild(popup);
+                    div.style.display = "flex";
+                    div.oncontextmenu = (event) => {
+                        event.stopPropagation();
+                    };
+                };
+                return img;
+            }
+
+            function createVideoEmbed (url) {
+                let video = document.createElement("video");
+                video.src = url;
+                video.controls = true;
+                video.style.maxWidth = "70%";
+                video.style.maxHeight = "200px";
+                video.onclick = function (event) {
+                    event.stopPropagation();
+                };
+                return video;
+            }
+
+            function createInviteEmbed(invite) {
+                let div = document.createElement("div");
+                div.className = "inviteDiv";
+                let title = document.createElement("span");
+                title.style.fontSize = "20px";
+                title.textContent = lang.inviteTitle;
+                let content = document.createElement("div");
+                content.className = "inviteContent";
+                let pic = document.createElement("img");
+                pic.className = "inviteImg";
+                let span = document.createElement("span");
+                let button = document.createElement("button");
+                button.style.marginLeft = "5px";
+                if (tokiponaala) button.style.fontFamily = "unset";
+
+                fetch(`${base}/invites/${invite}`).then(res => res.json()).then(result => {
+                    if (result.guild.icon) pic.src = `${cdn}/icons/${result.guild_id}/${result.guild.icon}.${result.guild.icon.startsWith("a_") ? "gif" : "png"}`;
+                    span.textContent = result.guild.name;
+                    if (result.guild.banner) content.style.backgroundImage = `url('${cdn}/banners/${result.guild_id}/${result.guild.banner}.${result.guild.banner.startsWith("a_") ? "gif" : "png"}') !important`;
+                    content.style.backgroundSize = "cover !important";
+                    content.style.backgroundRepeat = "no-repeat !important";
+                    content.style.backgroundPosition = "center !important";
+                    button.textContent = lang.joinGuild;
+                    button.onclick = (e) => {
+                        e.stopPropagation();
+                        joinGuild(invite);
+                    };
+                });
+
+                content.appendChild(pic);
+                content.appendChild(span);
+                content.appendChild(button);
+                div.appendChild(title);
+                div.appendChild(content);
+
+                return div;
+            }
+
+            async function download (event) {
+                event.stopPropagation();
+
+                const fileurl = event.target.getAttribute("data-fileurl");
+                const file = await fetch(fileurl, {
+                    method: "GET"
+                }).catch(error => {
+                    notification(error);
+                });
+                const blob = await file.blob();
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = event.target.getAttribute("data-filename");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+
+            function createFileEmbed (filename, url) {
+                let imageExt = [
+                    "png",
+                    "jpg",
+                    "jpeg",
+                    "webp",
+                    "gif"
+                ];
+                let videoExt = [
+                    "mp4",
+                    "webm",
+                    "ogv",
+                    "mov"
+                ];
+                let ext = url.split("/").pop().split(".").pop().split("?")[0].toLowerCase();
+                if (url.startsWith("https://fermi.chat/invite/") || url.startsWith("https://jank.booky.dev/invite/") || url.startsWith("https://staging.fosscord.com/invite/") || url.startsWith("https://fosscord-staging.thearcanebrony.net/invite/")) {
+                    return {
+                        "media": true,
+                        "embed": createInviteEmbed(url.split("/")[4].split("?")[0])
+                    }
+                }
+                if (imageExt.includes(ext)) {
+                    return {
+                        "media": true,
+                        "embed": createImageEmbed(url)
+                    };
+                }
+                if (videoExt.includes(ext)) {
+                    return {
+                        "media": true,
+                        "embed": createVideoEmbed(url)
+                    };
+                }
+                let span = document.createElement("span");
+                span.textContent = filename;
+                span.setAttribute("data-fileurl", url);
+                span.setAttribute("data-filename", filename);
+                span.onclick = download;
+                return {
+                    "media": false,
+                    "embed": span
+                };
+            }
+
+            function manageUrlEmbeds (str) {
+                let current = str;
+                let words = current.split(" ");
+                let spans = [];
+                for (let i = 0;i < words.length;i++) {
+                    let isUrl;
+                    let url;
+                    try {
+                        url = new URL(words[i]);
+                        isUrl = true;
+                    } catch (e) {
+                        isUrl = false;
+                    }
+                    if (!words[i].includes("/")) isUrl = false;
+                    if (isUrl) {
+                        let fileEmbed = createFileEmbed(words[i], words[i]);
+                        let two = current.split(words[i]);
+                        let span = document.createElement("span");
+                        let lines = two[0].split("\n");
+                        if (lines.length > 1) {
+                            for (let j = 0;j < lines.length - 1;j++) {
+                                let lineSpan = document.createElement("span");
+                                lineSpan.textContent = lines[j];
+                                span.appendChild(lineSpan);
+                                span.appendChild(document.createElement("br"));
+                            };
+                            let lineSpan = document.createElement("span");
+                            lineSpan.textContent = lines[lines.length];
+                            span.appendChild(lineSpan);
+                        }
+                        else span.textContent = lines[0];
+                        spans.push({
+                            "properties": {
+                                "embed": false,
+                                "media": false
+                            },
+                            "content": span
+                        });
+                        spans.push({
+                            "properties": {
+                                "embed": true,
+                                "media": fileEmbed.media
+                            },
+                            "content": fileEmbed.embed
+                        });
+                        current = current.substring(two[0].length + words[i].length);
+                    }
+                }
+                if (current) {
+                    let span = document.createElement("span");
+                    let lines = current.split("\n");
+                    if (lines.length > 1) {
+                        for (let j = 0;j < lines.length - 1;j++) {
+                            let lineSpan = document.createElement("span");
+                            lineSpan.textContent = lines[j];
+                            span.appendChild(lineSpan);
+                            span.appendChild(document.createElement("br"));
+                        };
+                        let lineSpan = document.createElement("span");
+                        lineSpan.textContent = lines[lines.length];
+                        span.appendChild(lineSpan);
+                    }
+                    else span.textContent = lines[0];
+                    spans.push({
+                        "properties": {
+                            "embed": false,
+                            "media": false
+                        },
+                        "content": span
+                    });
+                }
+                return spans;
+            }
+
+            function nanpa(nanpaike) {
+                let nanpapona = "";
+                if (nanpaike === 0) {
+                    nanpapona += "ala ";
+                } else {
+                    while (nanpaike > 0) {
+                        if (nanpaike >= 20) {
+                            nanpapona += "mute ";
+                            nanpaike -= 20;
+                        } else if (nanpaike >= 5) {
+                            nanpapona += "luka ";
+                            nanpaike -= 5;
+                        } else if (nanpaike >= 2) {
+                            nanpapona += "tu ";
+                            nanpaike -= 2;
+                        } else if (nanpaike >= 1) {
+                            nanpapona += "wan ";
+                            nanpaike -= 1;
+                        }
+                    }
+                }
+                return nanpapona;
+            }
+
+            let channeling = false;
+            let undefinedReplied = [];
+
+            function addMessage (message, append, box) {
+                messageList = document.getElementById("messages");
+
+                let messageElement;
+                let exist = messageList.querySelector(`[message_id="${message.id}"]`);
+                let grouped = false;
+                if (exist) {
+                    if (debug) console.log(exist)
+                    grouped = exist.classList.contains("grouped");
+                    messageElement = exist;
+                } else {
+                    messageElement = document.createElement("div");
+                }
+                messageElement.innerHTML = "";
+                messageElement.setAttribute("message_id", message.id);
+
+                messageElement.className = "messageElement";
+                if (!box) messageElement.addEventListener("click", (event) => {
+                    if (event.currentTarget.querySelector(".editForm")) return;
+                    messageToReply = message.id;
+                    let one = document.createElement("span");
+                    if (!tokiponaala) one.style.fontFamily = "nasinnanpa";
+
+                    let two = document.createElement("span");
+                    let three = document.createElement("span");
+                    let four = document.createElement("span");
+
+                    if (!tokiponaala) three.style.fontFamily = "nasinnanpa";
+                    let trad = lang.reply(message.author.username, message.content.length >= 100 ? message.content.slice(0, 100) + '...' : message.content);
+                    one.textContent = trad[0];
+                    two.textContent = trad[1];
+                    three.textContent = trad[2];
+                    four.textContent = trad[3];
+                    let reply = document.getElementById("reply");
+                    reply.innerHTML = "";
+                    reply.appendChild(one);
+                    reply.appendChild(two);
+                    reply.appendChild(three);
+                    reply.appendChild(four);
+                });
+                else messageElement.addEventListener("click", (event) => {
+                    showMessages(message.channel_id);
+                });
+
+                messageElement.addEventListener("contextmenu", messageContextMenu);
+
+                if (message.message_reference) {
+                    let replyElement = document.createElement("span");
+                    let one = document.createElement("span");
+                    if (!tokiponaala) one.style.fontFamily = "nasinnanpa";
+
+                    let two = document.createElement("span");
+                    let three = document.createElement("span");
+                    let four = document.createElement("span");
+
+                    if (!tokiponaala) three.style.fontFamily = "nasinnanpa";
+                    replyElement.setAttribute("message_reference", message.message_reference.message_id);
+
+                    let br = document.createElement("br");
+                    replyElement.appendChild(one);
+                    replyElement.appendChild(two);
+                    replyElement.appendChild(three);
+                    replyElement.appendChild(four);
+
+                    replyElement.style.fontStyle = "italic";
+                    replyElement.className = "replyElement";
+
+                    messageElement.appendChild(replyElement);
+                    messageElement.appendChild(br);
+
+                    let messageFromRoot = root.channels[message.channel_id].messages[message.message_reference.message_id];
+                    if (messageFromRoot) {
+                        let trad = lang.replyMessage(messageFromRoot.author.username, messageFromRoot.content.length >= 100 ? messageFromRoot.content.slice(0, 100) + '...' : messageFromRoot.content);
+                        one.textContent = trad[0];
+                        two.textContent = trad[1];
+                        three.textContent = trad[2];
+                        four.textContent = trad[3];
+                    } else {
+                        fetch(`${base}/channels/${message.channel_id}/messages/${message.message_reference.message_id}`, {
+                            method: "GET",
+                            headers: {
+                                "Authorization": token
+                            }
+                        })
+                            .then(response => response.json())
+                            .then(result => {
+                                if (result.code === 404) {
+                                    messageList.querySelectorAll(`[message_reference="${message.message_reference.message_id}"]`).forEach(reply => {
+                                        reply.children[0].textContent = lang.replyDeleted;
+                                        reply.children[1].textContent = "";
+                                        reply.children[2].textContent = "";
+                                        reply.children[3].textContent = "";
+                                    });
+                                    return;
+                                }
+                                messageList.querySelectorAll(`[message_reference="${message.message_reference.message_id}"]`).forEach(reply => {
+                                    reply.children[0].textContent = lang.replyUndefined;
+                                    reply.children[3].textContent = result.content.length >= 100 ? result.content.slice(0, 100) + '...' : result.content;
+                                });
+                                if (!undefinedReplied.includes(result.id)) undefinedReplied.push(result.id);
+                            })
+                            .catch(error => {
+                                notification([
+                                    {
+                                        content: error,
+                                        pona: false
+                                    }
+                                ]);
+                            });
+                    }
+                }
+
+                let avatarDiv = document.createElement("div");
+                if(!grouped) {
+                    let avatar_url;
+                    if (debug) notification([{
+                        content: "eee " + message.author.avatar,
+                        pona: false
+                    }]);
+                    if (message.author.avatar !== null) avatar_url = `${cdn}/avatars/${message.author.id}/${message.author.avatar}.png?size=1024`;
+                    else avatar_url = `${cdn}/embed/avatars/${message.author.discriminator % 6}.png`;
+                    let avatar = createImageEmbed(avatar_url);
+
+                    avatarDiv.className = "avatarDiv";
+                    avatar.className = "avatar";
+                    avatar.setAttribute("user_id", message.author.id);
+                    avatar.style.maxWidth = "40px";
+                    avatar.style.maxHeight = "40px";
+                    avatar.oncontextmenu = userContextMenu;
+                    avatarDiv.appendChild(avatar);
+                }
+
+                let messageBody = document.createElement("div");
+                messageBody.className = "messageBody";
+                if (!grouped) messageBody.appendChild(avatarDiv);
+
+                let userDiv = document.createElement("div");
+
+                let date = new Date(message.timestamp);
+                let timestamp = document.createElement("span");
+                if(!grouped) {
+                    let username = document.createElement("span");
+                    username.textContent = message.author.username;
+                    username.className = "author";
+                    username.setAttribute("user_id", message.author.id);
+                    username.style.fontSize = "18px";
+
+                    username.onclick = function (event) {
+                        event.stopPropagation();
+                        let div = document.getElementById("imagePopup");
+                        div.style.display = "none";
+                        profile.remove();
+                        contextmenu.remove();
+                        profileUser = message.author;
+
+                        if (message.author.avatar !== null) avatar_url = `${cdn}/avatars/${message.author.id}/${message.author.avatar}.png?size=1024`;
+                        else avatar_url = `${cdn}/embed/avatars/${message.author.discriminator % 6}.png`;
+                        let avatar = createImageEmbed(avatar_url);
+
+                        avatar.className = "avatar";
+                        avatar.style.maxWidth = "100px";
+                        avatar.style.maxHeight = "100px";
+
+                        profileAvatar.innerHTML = "";
+                        profileAvatar.appendChild(avatar);
+                        profileUsername.textContent = message.author.username;
+                        profileDiscriminator.textContent = "#" + message.author.discriminator;
+                        profilePronouns.textContent = message.author.pronouns;
+
+                        profileBio.innerHTML = "";
+                        let bioLines = [];
+                        for (let line of message.author.bio.split("\n")) {
+                            let span = document.createElement("span");
+                            span.textContent = line;
+                            profileBio.appendChild(span);
+                            profileBio.appendChild(document.createElement("br"));
+                        }
+
+                        document.body.appendChild(profile);
+
+                        profile.style.top = event.clientY;
+                        profile.style.left = event.clientX;
+
+                        const rect = profile.getBoundingClientRect();
+
+                        if (rect.bottom > window.innerHeight) {
+                            profile.style.top = event.clientY - rect.height;
+                        }
+                    };
+                    username.oncontextmenu = userContextMenu;
+                    userDiv.className = "userDiv";
+                    userDiv.appendChild(username);
+
+                    timestamp.className = "timestamp";
+
+                    if (tokiponaala) {
+                        timestamp.textContent = "  " + date.toLocaleTimeString(undefined);
+                    } else {
+                        let hours = date.getHours();
+                        let minutes = date.getMinutes();
+
+                        timestamp.textContent += " tenpo kipisi nanpa ";
+                        timestamp.textContent += nanpa(hours);
+                        timestamp.textContent += "la tenpo kipisi lili nanpa ";
+                        timestamp.textContent += nanpa(minutes);
+                        timestamp.textContent += "la";
+
+                        timestamp.style.fontFamily = "nasinnanpa";
+                    }
+                    timestamp.style.fontSize = "10px";
+                    timestamp.appendChild(document.createElement("br"));
+                    userDiv.appendChild(timestamp);
+                }
+
+                let messageRight = document.createElement("div");
+                messageRight.className = "messageRight";
+                if (!grouped) messageRight.appendChild(userDiv);
+
+                let messageContent = document.createElement("div");
+                messageContent.className = "messageContent";
+                let fixedContent = message.content.replace(/^>(\S)/gm, '\\>$1');
+                let unsafe = md.render(fixedContent);
+
+                let safe = DOMPurify.sanitize(unsafe);
+
+                let noemoji = message.content.replace(/<a?:(\w+):(\d+)>/g, "");
+
+                if (/^[\s]*$/.test(noemoji)) {
+                    safe = `<div class="emoji-only">${safe}</div>`;
+                }
+
+                messageContent.innerHTML = safe;
+
+                let links = messageContent.querySelectorAll("[data-fileurl]");
+                let embeds = [];
+                links.forEach(element => {
+                    let fileurl = element.getAttribute("data-fileurl");
+                    let embed = createFileEmbed(fileurl, fileurl);
+                    if (embed.media) embeds.push(embed.embed);
+                    else {
+                        element.setAttribute("data-filename", fileurl);
+                        element.onclick = download;
+                    }
+                });
+                if (message.edited_timestamp) {
+                    let edited = document.createElement("span");
+                    edited.textContent = lang.edited;
+                    if (!tokiponaala) edited.style.fontFamily = "nasinnanpa";
+                    edited.style.fontSize = "10px";
+                    messageContent.appendChild(edited);
+                }
+                if (message.attachments) {
+                    for (let attachment of message.attachments) {
+                        if (!attachment.content_type.startsWith("image/")) {
+                            embeds.push(createFileEmbed(attachment.filename, attachment.url).embed);
+                        } else {
+                            embeds.push(createImageEmbed(attachment.url));
+                        }
+                    }
+                }
+                if (embeds.length > 0) {
+                    if (message.content) messageContent.appendChild(document.createElement("br"));
+                    messageContent.appendChild(embeds[0]);
+                }
+                for (let i = 1; i<embeds.length;i++) {
+                    messageContent.appendChild(document.createElement("br"));
+                    messageContent.appendChild(embeds[i]);
+                }
+                messageRight.appendChild(messageContent);
+                messageBody.appendChild(messageRight);
+                messageElement.appendChild(messageBody);
+                if (exist) {
+                    if (grouped) group(messageElement);
+                    return;
+                }
+                if (box) {
+                    let messageBox = document.createElementById("messageBox");
+                    let channelBox = messageBox.querySelector(`[channel_id="${message.channel_id}"]`)
+                } else if (append) {
+                    if (messageList.childElementCount > 0) {
+                        let previousMessage = root.channels[channelid].messages[messageList.lastChild.getAttribute("message_id")];
+                        let previousDate = new Date(previousMessage.timestamp);
+                        let time = date - previousDate;
+
+                        if (time <= 60 * 1000 && previousMessage.author.id === message.author.id && !message.message_reference) {
+                            group(messageElement);
+                        }
+                        if (!(
+                            date.getDate() === previousDate.getDate() &&
+                            date.getMonth() === previousDate.getMonth() &&
+                            date.getFullYear() === previousDate.getFullYear()
+                        )) {
+                            messageList.appendChild(day(date));
+                        }
+                    } else {
+                        messageList.appendChild(day(date));
+                    }
+                    messageList.appendChild(messageElement);
+                } else {
+                    if (messageList.childElementCount > 0) {
+                        if (messageList.firstChild.className === "day") {
+                            if (messageList.childElementCount === 1) {
+                                messageList.firstChild.remove();
+                                messageList.prepend(messageElement);
+                                return;
+                            } else {
+                                messageList.firstChild.remove();
+                            }
+                        }
+                        let previousMessage = root.channels[channelid].messages[messageList.firstChild.getAttribute("message_id")];
+                        let previousDate = new Date(previousMessage.timestamp);
+                        let time = previousDate - date;
+                        if (time <= 60 * 1000 && previousMessage.author.id === message.author.id && !previousMessage.message_reference) {
+                            group(messageList.firstChild);
+                        }
+                        if (!(
+                            date.getDate() === previousDate.getDate() &&
+                            date.getMonth() === previousDate.getMonth() &&
+                            date.getFullYear() === previousDate.getFullYear()
+                        )) {
+                            messageList.prepend(day(previousDate));
+                        }
+                    }
+                    messageList.prepend(messageElement);
+                }
+            }
+
+            function group(messageElement) {
+                let avatar = messageElement.querySelector(".avatarDiv");
+                if (avatar) avatar.remove();
+                let user = messageElement.querySelector(".userDiv");
+                if (user) user.remove();
+
+                messageElement.style.marginTop = "0px";
+                messageElement.style.marginLeft = "40px";
+                messageElement.classList.toggle("grouped");
+                if (debug) notification([{
+                    content: messageElement.classList.contains("grouped") + "  " + messageElement.querySelector(".avatarDiv"),
+                    pona: false
+                }]);
+            }
+
+            function day(date) {
+                let dayElement = document.createElement("div");
+                let daySpan = document.createElement("span");
+
+                if (tokiponaala) {
+                    dayElement.className = "day";
+                    daySpan.textContent = date.toLocaleDateString(undefined, {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                    });
+                    dayElement.appendChild(daySpan);
+                } else {
+                    dayElement.className = "day";
+                    let weekDays = [
+                        "suno suno",
+                        "suno mun",
+                        "suno seli",
+                        "suno telo",
+                        "suno kasi",
+                        "suno kiwen",
+                        "suno ma"
+                    ];
+                    let months = [
+                        "mun lete",
+                        "mun lili",
+                        "mun kon",
+                        "mun telo",
+                        "mun kasi",
+                        "mun suno",
+                        "mun seli",
+                        "mun seli musi",
+                        "mun pali",
+                        "mun moli",
+                        "mun pimeja",
+                        "mun lete musi"
+                    ];
+                    daySpan.textContent = weekDays[date.getDay()] + " nanpa " + nanpa(date.getDate()) + "pi " + months[date.getMonth()] + " pi sike nanpa " + nanpa(date.getFullYear() % 100);
+                    daySpan.style.fontFamily = "nasinnanpa";
+                    dayElement.appendChild(daySpan);
+                }
+                return dayElement;
+            }
+
+            let fullChannels = [];
+
+            async function refreshMessages (channelid, beforeid) {
+                return await fetch(`${base}/channels/${channelid}/messages?${beforeid ? `before=${beforeid}&` : ""}limit=100`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": token
+                    }
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        let messageList = document.getElementById("messages");
+                        try {
+                            for (let message of result) {
+                                root.channels[channelid].messages[message.id] = message;
+                                if (undefinedReplied.includes(message.id)) {
+                                    messageList.querySelectorAll(`[message_reference="${message.id}"]`).forEach(reply => {
+                                        let trad = lang.replyRefresh(message.author.username);
+                                        reply.children[0].textContent = trad[0];
+                                        reply.children[1].textContent = trad[1];
+                                        reply.children[2].textContent = trad[2];
+                                    });
+                                }
+                                if (!root.users[message.author.id]) {
+                                    root.users[message.author.id] = message.author;
+                                }
+                            }
+                        } catch (e) {
+                            notification([
+                                {   
+                                    content: e + " in refreshMessages",
+                                    pona: false
+                                }
+                            ]);
+                        }
+                        return result;
+                    })
+                    .catch(error => {
+                        notification([
+                            {   
+                                content: error,
+                                pona: false
+                            }
+                        ]);
+                    });
+            }
+
+            async function showMessages (channelid, beforeid) {
+                try {
+                    if (channeling) {
+                        return;
+                    } else {
+                        channeling = true;
+                    }
+
+                    let notifDiv = document.getElementById("notificationDiv");
+
+                    if (!notifDiv.childNodes.length == 0) {
+                        notifDiv.querySelectorAll(`[channel_id="${channelid}"]`).forEach(child => child.remove());
+                    }
+
+                    let messages;
+
+                    let couldItNeedScroll = false;
+                    let needRefresh = true;
+                    let lastMessage = false;
+
+                    if (beforeid) {
+                        messages = await refreshMessages(channelid, beforeid);
+                        lastMessage = messages.length === 0;
+                        needRefresh = false;
+                    } else {
+                        if (Object.keys(root.channels[channelid].messages).length === 0) {
+                            messages = await refreshMessages(channelid, null);
+                            lastMessage = messages.length === 0;
+                        } else {
+                            messages = Object.values(root.channels[channelid].messages);
+                            lastMessage = messages.length === 0;
+                            messages.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                            couldItNeedScroll = true;
+                        }
+                    }
+
+                    messageList = document.getElementById("messages");
+                    if (needRefresh) messageList.innerHTML = "";
+
+                    for (let message of messages) {
+                        addMessage(message, false, false);
+                    }
+
+                    if (needRefresh) messageList.scrollTop = messageList.scrollHeight;
+
+                    updateTyping();
+
+                    channeling = false;
+
+                    if (couldItNeedScroll) scroll();
+                    if (lastMessage) {
+                        fullChannels.push(channelid);
+                        if (messageList.childElementCount === 0) {
+                            messageList.prepend(day(new Date()));
+                        } else if (messageList.firstChild.className !== "day") {
+                            messageList.prepend(day(new Date(root.channels[channelid].messages[messageList.firstChild.getAttribute("message_id")].timestamp)));
+                        }
+                    }
+
+                    if (unread.includes(channelid)) {
+                        if (messages.length === 0) {
+                            lastMessages[channelid] = null;
+                            localStorage.setItem("lastMessages", JSON.stringify(lastMessages));
+                            lastRead[channelid] = root.users.me.channels[channelid].last_message_id;
+                            localStorage.setItem("lastRead", JSON.stringify(lastRead));
+                        } else {
+                            if (messages[0].id !== root.users.me.channels[channelid].last_message_id) {
+                                lastMessages[channelid] = root.users.me.channels[channelid].last_message_id;
+                                localStorage.setItem("lastMessages", JSON.stringify(lastMessages));
+                            }
+                            lastRead[channelid] = messages[0].id;
+                            localStorage.setItem("lastRead", JSON.stringify(lastRead));
+                        }
+                        unread = unread.filter(value => value !== channelid);
+                        let element = document.getElementById("channels").querySelector(`[channel_id="${channelid}"]`);
+                        if (element) {
+                            element.classList.remove("unread");
+                            element.classList.add("read");
+                        }
+                        if (root.users.me.channels[channelid].type !== 1) {
+                            if (debug) notification([
+                                    {
+                                        content: JSON.stringify(Object.keys(root.guilds[root.users.me.channels[channelid].guild_id].channels)) + "  " + Object.keys(root.guilds[root.users.me.channels[channelid].guild_id].channels).some(channel => unread.includes(channel)),
+                                        pona: false
+                                    }
+                                ]);
+                            if (!Object.keys(root.guilds[root.users.me.channels[channelid].guild_id].channels).some(channel => unread.includes(channel))) {
+                                
+                                let element = document.getElementById("guilds").querySelector(`[guild_id="${root.users.me.channels[channelid].guild_id}"]`);
+                                if (element) {
+                                    element.classList.remove("unread");
+                                    element.classList.add("read");
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    notification([
+                        {
+                            content: e,
+                            pona: false
+                        }
+                    ]);
+                }
+            }
+
+            function inputTo(text) {
+                return text.replace(/\\\\n/g, "\u0000").replace(/\\n/g, "\n").replace(new RegExp("\u0000", "g"), "\\n");
+            }
+
+            function toInput(text) {
+                return text.replace(/\\n/g, "\u0000").replace(/\n/g, "\\n").replace(new RegExp("\u0000", "g"), "\\\\n");
+            }
+
+            function enter(event) {
+                if (event.key === "Enter") {
+                    if (event.shiftKey) document.getElementById("message").value += "\\n";
+                    else sendMessage();
+                }
+            }
+
+            function paste(event) {
+                try {
+                    let text = toInput(event.clipboardData.getData("Text"));
+                    if (text === event.clipboardData.getData("Text")) return;
+                    event.preventDefault();
+                    let message = document.getElementById("message");
+                    let part1 = message.value.substring(0, message.selectionStart);
+                    let part2 = message.value.substring(message.selectionStart);
+                    message.value = part1;
+                    message.value += text;
+                    message.value += part2;
+                } catch (e) {
+                    notification([
+                        {
+                            content: e,
+                            pona: false
+                        }
+                    ]);
+                }
+            } 
+
+            function sendMessage() {
+                const messageBar = document.getElementById("message");
+                const message = inputTo(messageBar.value.trim());
+                const attachments = document.getElementById("attachments").files;
+
+                if ((message || attachments) && channelid) {
+                    let formData = new FormData();
+                    const payload = {content: message};
+                    if (attachments) {
+                        for (let i = 0; i < attachments.length; i++) {
+                            formData.append("files[" + i + "]", attachments[i]);
+                        }
+
+                        document.getElementById("attachments").value = "";
+                    }
+                    if (messageToReply) {
+                        payload.message_reference = {message_id: messageToReply};
+                        document.getElementById("reply").innerHTML = "";
+                        messageToReply = "";
+                    }
+                    formData.append("payload_json", JSON.stringify(payload));
+                    fetch(`${base}/channels/${channelid}/messages`, {
+                        method: "POST",
+                        headers: {
+                            "Authorization": token
+                        },
+                        body: formData
+                    })
+                        .catch(error => {
+                            notification([
+                                {
+                                    content: error,
+                                    pona: false
+                                }
+                            ]);
+                        });
+                }
+                messageBar.value = "";
+                change();
+            };
+
+            let clearReply = () => {
+                messageToReply = "";
+                document.getElementById("reply").textContent = "";
+            };
+
+            let nimiponamute = {
+                "a": 0xF1900,
+                "akesi": 0xF1901,
+                "ala": 0xF1902,
+                "alasa": 0xF1903,
+                "ale": 0xF1904,
+                "ali": 0xF1904,
+                "anpa": 0xF1905,
+                "ante": 0xF1906,
+                "anu": 0xF1907,
+                "awen": 0xF1908,
+                "e": 0xF1909,
+                "en": 0xF190A,
+                "esun": 0xF190B,
+                "ijo": 0xF190C,
+                "ike": 0xF190D,
+                "ilo": 0xF190E,
+                "insa": 0xF190F,
+                "jaki": 0xF1910,
+                "jan": 0xF1911,
+                "jeli": 0xF1912,
+                "jelo": 0xF1912,
+                "jo": 0xF1913,
+                "kala": 0xF1914,
+                "kalama": 0xF1915,
+                "kama": 0xF1916,
+                "kasi": 0xF1917,
+                "ken": 0xF1918,
+                "kepeken": 0xF1919,
+                "kili": 0xF191A,
+                "kiwen": 0xF191B,
+                "ko": 0xF191C,
+                "kon": 0xF191D,
+                "kule": 0xF191E,
+                "kulupu": 0xF191F,
+                "kute": 0xF1920,
+                "la": 0xF1921,
+                "lape": 0xF1922,
+                "laso": 0xF1923,
+                "lawa": 0xF1924,
+                "len": 0xF1925,
+                "lete": 0xF1926,
+                "li": 0xF1927,
+                "lili": 0xF1928,
+                "linja": 0xF1929,
+                "lipu": 0xF192A,
+                "loje": 0xF192B,
+                "lon": 0xF192C,
+                "luka": 0xF192D,
+                "lukin": 0xF192E,
+                "lupa": 0xF192F,
+                "ma": 0xF1930,
+                "mama": 0xF1931,
+                "mani": 0xF1932,
+                "meli": 0xF1933,
+                "mi": 0xF1934,
+                "mije": 0xF1935,
+                "moku": 0xF1936,
+                "moli": 0xF1937,
+                "monsi": 0xF1938,
+                "mu": 0xF1939,
+                "mun": 0xF193A,
+                "musi": 0xF193B,
+                "mute": 0xF193C,
+                "nanpa": 0xF193D,
+                "nasa": 0xF193E,
+                "nasin": 0xF193F,
+                "nena": 0xF1940,
+                "ni": 0xF1941,
+                "nimi": 0xF1942,
+                "noka": 0xF1943,
+                "o": 0xF1944,
+                "olin": 0xF1945,
+                "ona": 0xF1946,
+                "open": 0xF1947,
+                "pakala": 0xF1948,
+                "pali": 0xF1949,
+                "palisa": 0xF194A,
+                "pan": 0xF194B,
+                "pana": 0xF194C,
+                "pi": 0xF194D,
+                "pilin": 0xF194E,
+                "pimeja": 0xF194F,
+                "pini": 0xF1950,
+                "pipi": 0xF1951,
+                "poka": 0xF1952,
+                "poki": 0xF1953,
+                "pona": 0xF1954,
+                "pu": 0xF1955,
+                "sama": 0xF1956,
+                "seli": 0xF1957,
+                "selo": 0xF1958,
+                "seme": 0xF1959,
+                "sewi": 0xF195A,
+                "sijelo": 0xF195B,
+                "sike": 0xF195C,
+                "sin": 0xF195D,
+                "sina": 0xF195E,
+                "sinpin": 0xF195F,
+                "sitelen": 0xF1960,
+                "sona": 0xF1961,
+                "soweli": 0xF1962,
+                "suli": 0xF1963,
+                "suno": 0xF1964,
+                "supa": 0xF1965,
+                "suwi": 0xF1966,
+                "tan": 0xF1967,
+                "taso": 0xF1968,
+                "tawa": 0xF1969,
+                "telo": 0xF196A,
+                "tenpo": 0xF196B,
+                "toki": 0xF196C,
+                "tomo": 0xF196D,
+                "tu": 0xF196E,
+                "unpa": 0xF196F,
+                "uta": 0xF1970,
+                "utala": 0xF1971,
+                "walo": 0xF1972,
+                "wan": 0xF1973,
+                "waso": 0xF1974,
+                "wawa": 0xF1975,
+                "weka": 0xF1976,
+                "wile": 0xF1977,
+                "namako": 0xF1978,
+                "kin": 0xF1979,
+                "oko": 0xF197A,
+                "kipisi": 0xF197B,
+                "leko": 0xF197C,
+                "monsuta": 0xF197D,
+                "tonsi": 0xF197E,
+                "jasima": 0xF197F,
+                "kijetesantakalu": 0xF1980,
+                "soko": 0xF1981,
+                "meso": 0xF1982,
+                "epiku": 0xF1983,
+                "kokosila": 0xF1984,
+                "lanpan": 0xF1985,
+                "n": 0xF1986,
+                "misikeke": 0xF1987,
+                "ku": 0xF1988,
+                "[": 0xF1990,
+                "]": 0xF1991,
+                "=": 0xF1992,
+                "-": 0xF1995,
+                "+": 0xF1996,
+                ".": 0xF199C,
+                ":": 0xF199D,
+                "(": 0xF1997,
+                ")": 0xF1998,
+                "_": 0xF1994
+            };
+
+            function otokipona(nimipona) {
+                return String.fromCodePoint(nimiponamute[nimipona]);
+            }
+
+            function opanasitelenpona () {
+                let pokipipanatokipona = document.getElementById("pokipipanatokipona");
+                let ilositelen = document.getElementById("message");
+
+                let tokimute = pokipipanatokipona.value;
+                pokipipanatokipona.value = "";
+
+                let ijonimimute = [
+                    "[",
+                    "]",
+                    "=",
+                    "-",
+                    "+",
+                    ".",
+                    ":",
+                    "(",
+                    ")",
+                    "_",
+                    " "
+                ];
+
+                let tokiponawanmute = [
+                    "a",
+                    "e",
+                    "i",
+                    "j",
+                    "k",
+                    "l",
+                    "m",
+                    "n",
+                    "o",
+                    "p",
+                    "s",
+                    "t",
+                    "u",
+                    "w",
+                ];
+
+                let toki = "";
+                let sitelenpona = "";
+                for (let tokiwan of tokimute) {
+                    if (ijonimimute.includes(tokiwan)) {
+                        if (nimiponamute[toki]) {
+                            let char = String.fromCodePoint(nimiponamute[toki]);
+                            sitelenpona += char;
+                        }
+                        if (tokiwan !== " ") {
+                            let char;
+
+                            let hmm = Array.from(sitelenpona);
+                            if (tokiwan === "(" && hmm[hmm.length - 1] === otokipona("pi")) {
+                                hmm = hmm.slice(0, -1);
+                                sitelenpona = hmm.join('');
+                                char = String.fromCodePoint(0xF1993);
+                            } else {
+                                char = String.fromCodePoint(nimiponamute[tokiwan]);
+                            }
+
+                            sitelenpona += char;
+                        }
+                        toki = "";
+                        continue;
+                    }
+
+                    if (tokiponawanmute.includes(tokiwan)) {
+                        toki += tokiwan;
+                    }
+                }
+
+                if (toki) {
+                    if (nimiponamute[toki]) {
+                        let char = String.fromCodePoint(nimiponamute[toki]);
+                        sitelenpona += char;
+                    }
+                }
+
+                if (editing) document.getElementById("messages").querySelector(".editInput").value += sitelenpona;
+                else ilositelen.value += sitelenpona;
+            }
+
+            function oanteeilopisitelenpona() {
+                let pokipipanatokipona = document.getElementById("pokipipanatokipona");
+                let ilositelen = document.getElementById("message");
+                if (ilopisitelenpona.style.display == "none" || ilopisitelenpona.style.display == "") {
+                    ilopisitelenpona.style.display = "block";
+                    ilositelen.style.fontFamily = "nasinnanpa";
+                    pokipisitelenmute.style.fontFamily = "nasinnanpa";
+                } else {
+                    ilopisitelenpona.style.display = "none";
+                    ilositelen.style.fontFamily = "";
+                }
+            }
+
+            function forceLeftDiv() {
+                document.getElementById("mobile").classList.toggle("slide");
+                document.getElementById("leftDiv").classList.toggle("show");
+            }
+
+            function scroll() {
+                if (fullChannels.includes(channelid)) {
+                    if (debug) notification([{
+                        content: "eee",
+                        pona: false
+                    }]);
+                    return;
+                }
+
+                let messageList = document.getElementById("messages");
+
+                if (messageList.scrollTop < 1000 && !channeling) {
+                    if (messageList.scrollTop === 0) {
+                        messageList.scrollTop = 100;
+                    }
+                    let messages = Object.keys(root.channels[channelid].messages);
+                    if (messageList.firstElementChild.className === "day") {
+                        showMessages(channelid, messageList.children[1].getAttribute("message_id"));
+                    } else {
+                        showMessages(channelid, messageList.firstElementChild.getAttribute("message_id"));
+                    }
+                }
+            }
+
+            function change() {
+                const attachments = document.getElementById("attachments").files;
+                const fileSpan = document.getElementById("fileSpan");
+                const fileName = document.getElementById("fileName");
+                const fileEnd = document.getElementById("fileEnd");
+
+                if (attachments.length === 1) {
+                    let trad = lang.file1(attachments[0].name);
+                    fileSpan.textContent = trad[0];
+                    fileName.textContent = trad[1];
+                    fileEnd.textContent = trad[2];
+                } else if (attachments.length === 2) {
+                    fileSpan.textContent = lang.file2;
+                    fileName.textContent = "";
+                    fileEnd.textContent = "";
+                } else if (attachments.length > 2) {
+                    fileSpan.textContent = lang.file3;
+                    fileName.textContent = "";
+                    fileEnd.textContent = "";
+                } else if (attachments.length === 0) {
+                    fileSpan.textContent = lang.file;
+                    fileName.textContent = "";
+                    fileEnd.textContent = "";
+                }
+            }
+
+            function joinGuild(invite) {
+                fetch(`${base}/invites/${invite}`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": token
+                    },
+                }).then(response => response.json()).then(result => {
+                    if (result.code === 404) {
+                        notification([
+                            {
+                                content: lang.inviteInvalid,
+                                pona: !tokiponaala
+                            }
+                        ]);
+                    }
+                });
+            }
+
+            let hasTyped = false;
+            function input() {
+                if (hasTyped) return;
+                hasTyped = true;
+                fetch(`${base}/channels/${channelid}/typing`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": token
+                    },
+                });
+                setTimeout(() => {
+                    hasTyped = false;
+                }, 4500);
+            }
+
+            function emojiSettings(emojiDiv, emojis, guild_id) {
+                emojiDiv.innerHTML = "";
+                for (let emoji of emojis) {
+                    let emojiImg = document.createElement("img");
+                    emojiImg.src = `${cdn}/emojis/${emoji.id}.${emoji.animated ? "gif" : "png"}`;
+                    emojiImg.style.width = "2em";
+                    emojiImg.style.maxWidth = "2em";
+                    emojiImg.style.height = "2em";
+                    emojiImg.style.maxHeight = "2em";
+                    emojiImg.oncontextmenu = (e) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        contextmenu.innerHTML = "";
+
+                        contextmenu.style.top = e.clientY;
+                        contextmenu.style.left = e.clientX;
+
+                        let editItem = document.createElement("div");
+                        editItem.className = "item";
+                        if (!tokiponaala) editItem.style.fontFamily = "nasinnanpa";
+                        editItem.textContent = lang.emojiEditing;
+                        editItem.onclick = (e) => {
+                            e.stopPropagation();
+                            contextmenu.remove();
+                            contextmenu.innerHTML = "";
+
+                            let emojiNameInput = document.createElement("input");
+                            emojiNameInput.className = "settingsInput";
+                            emojiNameInput.style.padding = "5px";
+                            emojiNameInput.value = emoji.name;
+                            emojiNameInput.placeholder = lang.emojiName;
+
+                            let emojiImageLabel = document.createElement("label");
+                            let emojiImageSpan = document.createElement("span");
+                            emojiImageSpan.textContent = lang.emojiUpload;
+                            emojiImageSpan.style.display = "none";
+                            let emojiImage = document.createElement("img");
+                            emojiImage.src = `${cdn}/emojis/${emoji.id}.${emoji.animated ? "gif" : "png"}`;
+                            emojiImage.style.width = "100px";
+                            emojiImage.style.height = "100px";
+                            emojiImage.style.maxWidth = "100px";
+                            emojiImage.style.maxHeight = "100px";
+                            let emojiImageInput = document.createElement("input");
+                            emojiImageInput.type = "file";
+                            emojiImageInput.style.display = "none";
+                            emojiImageInput.oninput = (e) => {
+                                if (!emojiImageInput.files[0]) {
+                                    emojiImageSpan.style.display = "block";
+                                    emojiImage.style.display = "none";
+                                    return;
+                                } else {
+                                    emojiImageSpan.style.display = "none";
+                                    emojiImage.style.display = "block";
+                                }
+                                let blob = new Blob([emojiImageInput.files[0]]);
+                                emojiImage.src = URL.createObjectURL(blob);
+                            };
+                            emojiImageLabel.appendChild(emojiImageSpan);
+                            emojiImageLabel.appendChild(emojiImage);
+                            emojiImageLabel.appendChild(emojiImageInput);
+
+                            let emojiSave = document.createElement("button");
+                            emojiSave.textContent = lang.save;
+                            if (tokiponaala) emojiSave.style.fontFamily = "unset";
+                            emojiSave.onclick = async (e) => {
+                                if ((emojiNameInput.value !== emoji.name) || emojiImageInput.files[0]) {
+                                    let body = {
+                                        name: emojiNameInput.value
+                                    }
+                                    if (emojiImageInput.files[0]) body.image = await base64(emojiImageInput.files[0]);
+                                    let resp = await fetch(`${base}/guilds/${guild_id}/emojis/${emoji.id}`, {
+                                        method: "PATCH",
+                                        headers: {
+                                            "Authorization": token,
+                                            "Content-Type": "application/json"
+                                        },
+                                        body: JSON.stringify(body)
+                                    });
+                                    contextmenu.remove();
+                                }
+                            };
+
+                            contextmenu.appendChild(emojiNameInput);
+                            contextmenu.appendChild(emojiImageLabel);
+                            contextmenu.appendChild(emojiSave);
+
+                            settings.appendChild(contextmenu);
+
+                            contextmenu.style.top = (((window.innerHeight / 2) - (contextmenu.offsetHeight / 2)).toString() + "px");
+                            contextmenu.style.left = (((window.innerWidth / 2) - (contextmenu.offsetWidth / 2)).toString() + "px");
+                        }
+
+                        let deleteItem = document.createElement("div");
+                        deleteItem.className = "item";
+                        if (!tokiponaala) deleteItem.style.fontFamily = "nasinnanpa";
+                        deleteItem.textContent = lang.emojiDeleting;
+                        deleteItem.onclick = async (e) => {
+                            await fetch(`${base}/guilds/${guild_id}/emojis/${emoji.id}`, {
+                                method: "DELETE",
+                                headers: {
+                                    "Authorization": token
+                                }
+                            });
+                            contextmenu.remove();
+                        }
+
+                        contextmenu.appendChild(editItem);
+                        contextmenu.appendChild(deleteItem);
+
+                        document.body.appendChild(contextmenu);
+                    }
+                    emojiDiv.appendChild(emojiImg);
+                }
+            }
+
+            let saving = false;
+            let unsaved = false;
+
+            function guildContextMenu(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+                profile.remove();
+                if (debug) notification([
+                    {
+                        content: event.target.getAttribute("guild_id"),
+                        pona: false
+                    }
+                ]);
+                let guild_id = event.target.getAttribute("guild_id");
+                let guild = root.users.me.guilds[guild_id];
+
+                let managePerm = (guild.owner_id === user.id) || (root.users.me.permissions[guild_id] & BigInt(8)) === BigInt(8) || (root.users.me.permissions[guild_id] & BigInt(32)) === BigInt(32);
+                let emojiPerm = (root.users.me.permissions[guild_id] & BigInt(1 << 30)) === BigInt(1 << 30);
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let leaveItem = document.createElement("div");
+                leaveItem.className = "item";
+                if (!tokiponaala) leaveItem.style.fontFamily = "nasinnanpa";
+                leaveItem.textContent = lang.leave;
+                leaveItem.onclick = (event) => {
+                    if (debug) notification([
+                        {
+                            content: guild_id,
+                            pona: false
+                        }
+                    ]);
+
+                    fetch(`${base}/users/@me/guilds/${guild_id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": token
+                        },
+                    }).then(response => response.json()).then(result => {
+                        if (result.code === 404) {
+                            notification([
+                                {
+                                    content: lang.error,
+                                    pona: !tokiponaala
+                                }
+                            ]);
+                        }
+                    });
+                };
+                contextmenu.appendChild(leaveItem);
+
+                let settingsItem = document.createElement("div");
+                settingsItem.className = "item";
+                if (!tokiponaala) settingsItem.style.fontFamily = "nasinnanpa";
+                settingsItem.textContent = lang.guildSettings;
+                settingsItem.onclick = function (event) {
+                    contextmenu.remove();
+                    document.getElementById("mainDiv").style.display = "none";
+                    let settings = document.getElementById("settings");
+                    let settingContent = document.getElementById("settingContent");
+                    settingContent.innerHTML = "";
+                    settings.style.display = "block";
+                    let nameLabel = document.createElement("span");
+                    nameLabel.textContent = lang.guildName;
+                    if (!tokiponaala) nameLabel.style.fontFamily = "nasinnanpa";
+                    let nameInput = document.createElement("input");
+                    nameInput.style.marginLeft = "5px";
+                    nameInput.className = "settingsInput";
+                    if (!managePerm) nameInput.disabled = "true";
+                    let emojiDiv = document.createElement("div");
+                    emojiDiv.id = "emojiSettings";
+
+                    emojiSettings(emojiDiv, guild.emojis, guild_id);
+
+                    let emojiCreate = document.createElement("button");
+                    emojiCreate.textContent = lang.emojiCreation;
+                    if (tokiponaala) emojiCreate.style.fontFamily = "unset";
+                    emojiCreate.onclick = (e) => {
+                        e.stopPropagation();
+                        contextmenu.innerHTML = "";
+
+                        let emojiNameInput = document.createElement("input");
+                        emojiNameInput.className = "settingsInput";
+                        emojiNameInput.style.padding = "5px";
+                        emojiNameInput.placeholder = lang.emojiName;
+
+                        let emojiImageLabel = document.createElement("label");
+                        let emojiImageSpan = document.createElement("span");
+                        emojiImageSpan.textContent = lang.emojiUpload;
+                        let emojiImage = document.createElement("img");
+                        emojiImage.style.width = "100px";
+                        emojiImage.style.height = "100px";
+                        emojiImage.style.maxWidth = "100px";
+                        emojiImage.style.maxHeight = "100px";
+                        emojiImage.style.display = "none";
+                        let emojiImageInput = document.createElement("input");
+                        emojiImageInput.type = "file";
+                        emojiImageInput.style.display = "none";
+                        emojiImageInput.oninput = (e) => {
+                            if (!emojiImageInput.files[0]) {
+                                emojiImageSpan.style.display = "block";
+                                emojiImage.style.display = "none";
+                                return;
+                            } else {
+                                emojiImageSpan.style.display = "none";
+                                emojiImage.style.display = "block";
+                            }
+                            let blob = new Blob([emojiImageInput.files[0]]);
+                            emojiImage.src = URL.createObjectURL(blob);
+                        };
+                        emojiImageLabel.appendChild(emojiImageSpan);
+                        emojiImageLabel.appendChild(emojiImage);
+                        emojiImageLabel.appendChild(emojiImageInput);
+
+                        let emojiSave = document.createElement("button");
+                        emojiSave.textContent = lang.save;
+                        if (tokiponaala) emojiSave.style.fontFamily = "unset";
+                        emojiSave.onclick = async (e) => {
+                            if (emojiNameInput.value && emojiImageInput.files[0]) {
+                                await fetch(`${base}/guilds/${guild_id}/emojis`, {
+                                    method: "POST",
+                                    headers: {
+                                        "Authorization": token,
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({
+                                        name: emojiNameInput.value,
+                                        image: await base64(emojiImageInput.files[0])
+                                    })
+                                });
+                                contextmenu.remove();
+                            }
+                        };
+
+                        contextmenu.appendChild(emojiNameInput);
+                        contextmenu.appendChild(emojiImageLabel);
+                        contextmenu.appendChild(emojiSave);
+
+                        settings.appendChild(contextmenu);
+
+                        contextmenu.style.top = (((window.innerHeight / 2) - (contextmenu.offsetHeight / 2)).toString() + "px");
+                        contextmenu.style.left = (((window.innerWidth / 2) - (contextmenu.offsetWidth / 2)).toString() + "px");
+                    }
+
+                    let saveDiv = document.getElementById("saveDiv");
+                    nameInput.value = guild.name;
+                    nameInput.addEventListener("input", (event) => {
+                        if (event.target.value !== guild.name) {
+                            unsaved = true;
+                            saveDiv.style.display = "block";
+                            saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                        } else {
+                            unsaved = false;
+                            saveDiv.style.display = "none";
+                        }
+                    });
+                    let save = document.getElementById("save");
+                    save.textContent = lang.save;
+                    save.style.fontSize = "20px";
+                    async function saveClick (event) {
+                        if (nameInput.value !== guild.name) {
+                            if (saving) return;
+                            saving = true;
+                            event.target.onclick = null;
+                            let json = {"name": nameInput.value};
+                            let response = await fetch(`${base}/guilds/${guild_id}/`, {
+                                method: "PATCH",
+                                headers: {
+                                    "Authorization": token,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(json)
+                            });
+                            let result = await response.json();
+                            if (result.code === undefined) {
+                                unsaved = false;
+                                event.target.parentElement.style.display = "none";
+                            }
+                            saving = false;
+                            event.target.onclick = saveClick;
+                        }
+                    }
+                    save.onclick = saveClick;
+
+                    let deleteButton = document.createElement("button");
+                    deleteButton.className = "deleteButton";
+                    deleteButton.textContent = lang.guildDelete;
+                    if (tokiponaala) deleteButton.style.fontFamily = "unset";
+                    deleteButton.style.backgroundColor = "#C30010";
+                    deleteButton.style.borderRadius = "5px";
+                    deleteButton.style.marginTop = "30vh";
+                    deleteButton.onclick = (event) => {
+                        event.stopPropagation();
+                        contextmenu.innerHTML = "";
+
+                        let deleteLabel = document.createElement("div");
+                        deleteLabel.textContent = lang.guildDeleteLabel;
+                        deleteLabel.style.color = "#C30010";
+                        deleteLabel.style.padding = "5px";
+
+                        let deleteInput = document.createElement("input");
+                        deleteInput.className = "settingsInput";
+                        deleteInput.style.padding = "5px";
+
+                        let deleteItem = document.createElement("div");
+                        deleteItem.textContent = lang.guildDelete
+                        deleteItem.style.padding = "5px";
+                        deleteItem.onclick = () => {
+                            if (deleteInput.value === lang.guildDeleteYes) fetch(`${base}/guilds/${guild_id}/delete`, {
+                                method: "POST",
+                                headers: {
+                                    "Authorization": token,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({})
+                            }).then(response => response.json()).then(result => {
+                                if (debug) notification([
+                                    {
+                                        content: JSON.stringify(result),
+                                        pona: false
+                                    }
+                                ]);
+                                contextmenu.remove();
+                            }).catch(e => {
+                                if (debug) notification([
+                                    {
+                                        content: e,
+                                        pona: false
+                                    }
+                                ]);
+                            });
+                        };
+
+                        contextmenu.appendChild(deleteLabel);
+                        contextmenu.appendChild(deleteInput);
+                        contextmenu.appendChild(deleteItem);
+
+                        settings.appendChild(contextmenu);
+
+                        contextmenu.style.top = (((window.innerHeight / 2) - (contextmenu.offsetHeight / 2)).toString() + "px");
+                        contextmenu.style.left = (((window.innerWidth / 2) - (contextmenu.offsetWidth / 2)).toString() + "px");
+                    }
+
+                    settingContent.appendChild(nameLabel);
+                    settingContent.appendChild(nameInput);
+                    settingContent.appendChild(emojiDiv);
+                    settingContent.appendChild(emojiCreate);
+                    settingContent.appendChild(document.createElement("br"));
+                    if (guild.owner_id === user.id) settingContent.appendChild(deleteButton);
+                };
+                if (managePerm || emojiPerm) contextmenu.appendChild(settingsItem);
+
+                document.body.appendChild(contextmenu);
+            }
+
+            function guildsContextMenu(event) {
+                profile.remove();
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let settingsItem = document.createElement("div");
+                settingsItem.className = "item";
+                if (!tokiponaala) settingsItem.style.fontFamily = "nasinnanpa";
+                settingsItem.textContent = lang.guildCreation;
+                settingsItem.onclick = function (event) {
+                    contextmenu.remove();
+                    document.getElementById("mainDiv").style.display = "none";
+                    let settings = document.getElementById("settings");
+                    let settingContent = document.getElementById("settingContent");
+                    settingContent.innerHTML = "";
+                    settings.style.display = "block";
+                    let nameLabel = document.createElement("span");
+                    nameLabel.textContent = lang.guildName;
+                    if (!tokiponaala) nameLabel.style.fontFamily = "nasinnanpa";
+                    let nameInput = document.createElement("input");
+                    nameInput.style.marginLeft = "5px";
+                    nameInput.className = "settingsInput";
+                    let saveDiv = document.getElementById("saveDiv");
+                    let save = document.getElementById("save");
+                    save.textContent = lang.saveCreation;
+                    save.style.fontSize = "20px";
+                    saveDiv.style.display = "block";
+                    saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                    async function saveClick (event) {
+                        if (nameInput.value) {
+                            if (saving) return;
+                            saving = true;
+                            event.target.onclick = null;
+                            let json = {"name": nameInput.value};
+                            let response = await fetch(`${base}/guilds/`, {
+                                method: "POST",
+                                headers: {
+                                    "Authorization": token,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(json)
+                            });
+                            let result = await response.json();
+                            if (result.code === undefined) {
+                                event.target.parentElement.style.display = "none";
+                            }
+                            saving = false;
+                            event.target.onclick = saveClick;
+                        }
+                    }
+                    save.onclick = saveClick;
+
+                    settingContent.appendChild(nameLabel);
+                    settingContent.appendChild(nameInput);
+                };
+
+                contextmenu.appendChild(settingsItem);
+
+                document.body.appendChild(contextmenu);
+            }
+
+            let editing = {boo: false, message_id: null};
+
+            function messageContextMenu(event) {
+                profile.remove();
+                if (event.target.className === "avatar" || event.target.className === "author") {
+                    return;
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+
+                let message_id = event.currentTarget.getAttribute("message_id");
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let editItem = document.createElement("div");
+                editItem.className = "item";
+                if (!tokiponaala) editItem.style.fontFamily = "nasinnanpa";
+                editItem.textContent = lang.messageEditing;
+                editItem.onclick = (event) => {
+                    contextmenu.remove();
+                    if (editing.boo) {
+                        addMessage(root.channels[channelid].messages[editing.message_id], null, false);
+                    }
+                    editing.boo = true;
+                    editing.message_id = message_id;
+
+                    let messageElement = document.getElementById("messages").querySelector(`[message_id="${message_id}"]`);
+                    let messageContent = messageElement.querySelector(`.messageContent`);
+
+                    messageContent.innerHTML = "";
+
+                    let editForm = document.createElement("form");
+                    editForm.className = "editForm";
+                    editForm.addEventListener("submit", async function (e) {
+                        e.preventDefault();
+
+                        let editInput = e.target.querySelector("input");
+                        if (editInput.value === "" || editInput.value === toInput(root.channels[channelid].messages[message_id].content)) {
+                            addMessage(root.channels[channelid].messages[message_id], null, false);
+                            editing.boo = false;
+                            return;
+                        }
+
+                        await fetch(`${base}/channels/${channelid}/messages/${message_id}`, {
+                            method: "PATCH",
+                            headers: {
+                                "Authorization": token,
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                content: inputTo(editInput.value)
+                            })
+                        });
+
+                        messageContent.remove();
+
+                        editing.boo = false;
+                    });
+
+                    let editInput = document.createElement("input");
+                    editInput.className = "editInput";
+                    editInput.style.fontFamily = "unset";
+                    editInput.type = "text";
+                    editInput.autocomplete = "off";
+                    editInput.value = toInput(root.channels[channelid].messages[message_id].content);
+
+                    let editButton = document.createElement("button");
+                    editButton.type = "submit";
+                    if (tokiponaala) editButton.style.fontFamily = "unset";
+                    editButton.textContent = lang.save;
+
+                    editForm.appendChild(editInput);
+                    editForm.appendChild(editButton);
+
+                    messageContent.appendChild(editForm);
+                };
+
+                let deleteItem = document.createElement("div");
+                deleteItem.className = "item";
+                if (!tokiponaala) deleteItem.style.fontFamily = "nasinnanpa";
+                deleteItem.textContent = lang.messageDelete;
+
+                deleteItem.addEventListener("click", async function (event) {
+                    await fetch(`${base}/channels/${channelid}/messages/${message_id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": token,
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                    contextmenu.remove();
+                });
+                let deletePerm = false;
+                try {
+                    if (root.channels[channelid].messages[event.currentTarget.getAttribute("message_id")].author.id === user.id) contextmenu.appendChild(editItem);
+                    if (root.users.me.channels[channelid].type !== 1) if (root.users.me.guilds[root.users.me.channels[channelid].guild_id].owner_id === user.id) deletePerm = true;
+                    if (root.users.me.channels[channelid].type === 1) {
+                        if (root.channels[channelid].messages[event.currentTarget.getAttribute("message_id")].author.id === user.id) deletePerm = true;
+                    }
+                    else if ((root.users.me.permissions[channelid] & BigInt(8)) === BigInt(8) || (root.channels[channelid].messages[event.currentTarget.getAttribute("message_id")].author.id === user.id) || (root.users.me.permissions[channelid] & BigInt(8192)) === BigInt(8192)) deletePerm = true;
+                } catch (e) {
+                    notification([
+                        {
+                            content: e,
+                            pona: false
+                        }
+                    ]);
+                }
+                if (deletePerm) contextmenu.appendChild(deleteItem);
+
+                document.body.appendChild(contextmenu);
+            }
+
+            function channelContextMenu(event) {
+                profile.remove();
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+                let channel_id = event.target.getAttribute("channel_id");
+                let channel = root.users.me.channels[channel_id];
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let settingsItem = document.createElement("div");
+                settingsItem.className = "item";
+                if (!tokiponaala) settingsItem.style.fontFamily = "nasinnanpa";
+                settingsItem.textContent = lang.channelSettings;
+                settingsItem.onclick = function (event) {
+                    contextmenu.remove();
+                    document.getElementById("mainDiv").style.display = "none";
+                    let settings = document.getElementById("settings");
+                    let settingContent = document.getElementById("settingContent");
+                    settingContent.innerHTML = "";
+                    settings.style.display = "block";
+                    let nameLabel = document.createElement("span");
+                    nameLabel.textContent = lang.channelName;
+                    if (!tokiponaala) nameLabel.style.fontFamily = "nasinnanpa";
+                    let nameInput = document.createElement("input");
+                    nameInput.style.marginLeft = "5px";
+                    nameInput.className = "settingsInput";
+                    let saveDiv = document.getElementById("saveDiv");
+                    nameInput.value = channel.name;
+                    nameInput.addEventListener("input", (event) => {
+                        if (event.target.value !== channel.name) {
+                            unsaved = true;
+                            saveDiv.style.display = "block";
+                            saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                        } else {
+                            unsaved = false;
+                            saveDiv.style.display = "none";
+                        }
+                    });
+                    let save = document.getElementById("save");
+                    save.textContent = lang.save;
+                    save.style.fontSize = "20px";
+                    async function saveClick (event) {
+                        if (nameInput.value !== channel.name) {
+                            if (saving) return;
+                            saving = true;
+                            event.target.onclick = null;
+                            let json = {"name": nameInput.value}
+                            let response = await fetch(`${base}/channels/${channel_id}`, {
+                                method: "PATCH",
+                                headers: {
+                                    "Authorization": token,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(json)
+                            });
+                            let result = await response.json();
+                            if (result.code === undefined) {
+                                unsaved = false;
+                                event.target.parentElement.style.display = "none";
+                            } else {
+                                notification([
+                                    {
+                                        content: JSON.stringify(result) + " " + place + " " + channel_id,
+                                        pona: false
+                                    }
+                                ]);
+                            }
+                            saving = false;
+                            event.target.onclick = saveClick;
+                        }
+                    }
+                    save.onclick = saveClick;
+
+                    settingContent.appendChild(nameLabel);
+                    settingContent.appendChild(nameInput);
+                };
+
+                let deleteItem = document.createElement("div");
+                deleteItem.className = "item";
+                if (!tokiponaala) deleteItem.style.fontFamily = "nasinnanpa";
+                deleteItem.textContent = lang.channelDelete;
+                deleteItem.onclick = function (event) {
+                    event.stopPropagation();
+                    contextmenu.remove();
+                    contextmenu.innerHTML = "";
+
+                    let deleteLabel = document.createElement("div");
+                    deleteLabel.textContent = lang.channelDeleteLabel;
+                    deleteLabel.style.color = "#C30010";
+                    deleteLabel.style.padding = "5px";
+
+                    let deleteItem = document.createElement("div");
+                    deleteItem.textContent = lang.channelDelete;
+                    deleteItem.style.padding = "5px";
+                    deleteItem.onclick = () => {
+                        fetch(`${base}/channels/${channel_id}/`, {
+                            method: "DELETE",
+                            headers: {
+                                "Authorization": token,
+                                "Content-Type": "application/json"
+                            }
+                        }).then(response => response.json()).then(result => {
+                            if (debug) notification([
+                                {
+                                    content: JSON.stringify(result),
+                                    pona: false
+                                }
+                            ]);
+                            contextmenu.remove();
+                        }).catch(e => {
+                            if (debug) notification([
+                                {
+                                    content: e,
+                                    pona: false
+                                }
+                            ]);
+                        });
+                    };
+
+                    contextmenu.appendChild(deleteLabel);
+                    contextmenu.appendChild(deleteItem);
+
+                    document.body.appendChild(contextmenu);
+
+                    contextmenu.style.top = (((window.innerHeight / 2) - (contextmenu.offsetHeight / 2)).toString() + "px");
+                    contextmenu.style.left = (((window.innerWidth / 2) - (contextmenu.offsetWidth / 2)).toString() + "px");
+                };
+
+                if (root.users.me.guilds[channel.guild_id].owner_id === user.id) {
+                    contextmenu.appendChild(settingsItem);
+                    contextmenu.appendChild(deleteItem);
+                }
+                else if ((root.users.me.permissions[channel_id] & BigInt(8)) === BigInt(8) || (root.users.me.permissions[channel_id] & BigInt(16)) === BigInt(16)) {
+                    contextmenu.appendChild(settingsItem);
+                    contextmenu.appendChild(deleteItem);
+                }
+
+                document.body.appendChild(contextmenu);
+            }
+
+            function channelsContextMenu(event) {
+                profile.remove();
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let settingsItem = document.createElement("div");
+                settingsItem.className = "item";
+                if (!tokiponaala) settingsItem.style.fontFamily = "nasinnanpa";
+                settingsItem.textContent = lang.channelCreation;
+                settingsItem.onclick = function (event) {
+                    contextmenu.remove();
+                    document.getElementById("mainDiv").style.display = "none";
+                    let settings = document.getElementById("settings");
+                    let settingContent = document.getElementById("settingContent");
+                    settingContent.innerHTML = "";
+                    settings.style.display = "block";
+                    let nameLabel = document.createElement("span");
+                    nameLabel.textContent = lang.channelName;
+                    if (!tokiponaala) nameLabel.style.fontFamily = "nasinnanpa";
+                    let nameInput = document.createElement("input");
+                    nameInput.style.marginLeft = "5px";
+                    nameInput.className = "settingsInput";
+                    let saveDiv = document.getElementById("saveDiv");
+                    let save = document.getElementById("save");
+                    save.textContent = lang.saveCreation;
+                    save.style.fontSize = "20px";
+                    saveDiv.style.display = "block";
+                    saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                    async function saveClick (event) {
+                        if (nameInput.value) {
+                            if (saving) return;
+                            saving = true;
+                            event.target.onclick = null;
+                            let json = {"name": nameInput.value, "type": 0};
+                            let response = await fetch(`${base}/guilds/${place}/channels/`, {
+                                method: "POST",
+                                headers: {
+                                    "Authorization": token,
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify(json)
+                            });
+                            let result = await response.json();
+                            if (result.code === undefined) {
+                                event.target.parentElement.style.display = "none";
+                            }
+                            saving = false;
+                            event.target.onclick = saveClick;
+                        }
+                    }
+                    save.onclick = saveClick;
+
+                    settingContent.appendChild(nameLabel);
+                    settingContent.appendChild(nameInput);
+                };
+                if (root.users.me.guilds[place].owner_id === user.id) contextmenu.appendChild(settingsItem);
+                else if ((root.users.me.permissions[place] & BigInt(8)) === BigInt(8) || (root.users.me.permissions[place] & BigInt(16)) === BigInt(16)) contextmenu.appendChild(settingsItem);
+
+                document.body.appendChild(contextmenu);
+            }
+
+            function base64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function userContextMenu(event) {
+                profile.remove();
+                event.preventDefault();
+                event.stopPropagation();
+                contextmenu.innerHTML = "";
+
+                contextmenu.style.top = event.clientY;
+                contextmenu.style.left = event.clientX;
+
+                let user_id = event.target.getAttribute("user_id");
+
+                let dmItem = document.createElement("div");
+                dmItem.className = "item";
+                if (!tokiponaala) dmItem.style.fontFamily = "nasinnanpa";
+                dmItem.textContent = lang.addDm;
+                dmItem.onclick = () => {
+                    contextmenu.remove();
+                    addDm(user_id);
+                };
+
+                let mentionItem = document.createElement("div");
+                mentionItem.className = "item";
+                if (!tokiponaala) mentionItem.style.fontFamily = "nasinnanpa";
+                mentionItem.textContent = lang.mention;
+                mentionItem.onclick = () => {
+                    mention(user_id);
+                };
+
+                let settingsItem = document.createElement("div");
+                settingsItem.className = "item";
+                if (!tokiponaala) settingsItem.style.fontFamily = "nasinnanpa";
+                settingsItem.textContent = lang.userSettings;
+                settingsItem.onclick = () => {
+                    let accountunsaved = false;
+                    let profileunsaved = false;
+                    contextmenu.remove();
+                    document.getElementById("mainDiv").style.display = "none";
+                    let settings = document.getElementById("settings");
+                    let settingContent = document.getElementById("settingContent");
+                    settingContent.innerHTML = "";
+                    settings.style.display = "block";
+                    let nameLabel = document.createElement("span");
+                    nameLabel.textContent = lang.username;
+                    if (!tokiponaala) nameLabel.style.fontFamily = "nasinnanpa";
+                    let nameInput = document.createElement("input");
+                    nameInput.style.marginLeft = "5px";
+                    nameInput.className = "settingsInput";
+                    let avatarLabel = document.createElement("label");
+                    if (!tokiponaala) avatarLabel.style.fontFamily = "nasinnanpa";
+                    let avatarSpan = document.createElement("span");
+                    avatarSpan.textContent = lang.avatarEdit;
+                    let avatarInput = document.createElement("input");
+                    avatarInput.className = "settingsInput";
+                    avatarInput.style.display = "none";
+                    avatarInput.type = "file";
+                    let avatarPreview = document.createElement("img");
+                    avatarPreview.style.maxHeight = "100px";
+                    avatarPreview.style.maxWidth = "100px";
+                    avatarPreview.style.marginBottom = "-15px";
+                    let currentAvatar = `${cdn}/avatars/${user.id}/${user.avatar}.png?size=1024`;
+                    if (user.avatar) {
+                        avatarPreview.src = currentAvatar;
+                        avatarPreview.style.display = "flex";
+                    } else {
+                        avatarPreview.src = "";
+                        avatarPreview.style.display = "none";
+                    }
+                    avatarLabel.appendChild(avatarSpan);
+                    avatarLabel.appendChild(avatarPreview);
+                    avatarLabel.appendChild(avatarInput);
+                    let nullAvatar = document.createElement("button");
+                    nullAvatar.textContent = lang.avatarRemove;
+                    nullAvatar.style.marginBottom = "5px";
+                    if (tokiponaala) nullAvatar.style.fontFamily = "unset";
+                    let nulled = false;
+                    function nullify () {
+                        function unnullify () {
+                            nullAvatar.textContent = lang.avatarRemove;
+                            nullAvatar.onclick = nullify;
+                            nulled = false;
+                            avatarPreview.src = currentAvatar;
+                            avatarPreview.style.display = "flex";
+                            isunsaved();
+                        }
+                        nullAvatar.textContent = lang.avatarDontRemove;
+                        nullAvatar.onclick = unnullify;
+                        nulled = true;
+                        avatarPreview.src = "";
+                        avatarPreview.style.display = "none";
+                        isunsaved();
+                    }
+                    nullAvatar.onclick = nullify;
+                    if (user.avatar) nullAvatar.style.display = "flex";
+                    else nullAvatar.style.display = "none";
+                    let pronounsLabel = document.createElement("span");
+                    pronounsLabel.textContent = lang.pronouns;
+                    if (!tokiponaala) pronounsLabel.style.fontFamily = "nasinnanpa";
+                    let pronounsInput = document.createElement("input");
+                    pronounsInput.style.marginLeft = "5px";
+                    pronounsInput.className = "settingsInput";
+                    let bioLabel = document.createElement("span");
+                    bioLabel.textContent = lang.bio;
+                    if (!tokiponaala) bioLabel.style.fontFamily = "nasinnanpa";
+                    let bioInput = document.createElement("input");
+                    bioInput.style.marginLeft = "5px";
+                    bioInput.className = "settingsInput";
+                    let saveDiv = document.getElementById("saveDiv");
+                    nameInput.value = user.username;
+                    pronounsInput.value = user.pronouns;
+                    bioInput.value = toInput(user.bio);
+                    let passwordLabel = document.createElement("span");
+                    passwordLabel.textContent = lang.password;
+                    if (!tokiponaala) passwordLabel.style.fontFamily = "nasinnanpa";
+                    let passwordInput = document.createElement("input");
+                    passwordInput.style.marginLeft = "5px";
+                    passwordInput.type = "password";
+                    passwordInput.className = "settingsInput";
+                    passwordInput.disabled = true;
+                    let save = document.getElementById("save");
+                    save.textContent = lang.save;
+                    save.style.fontSize = "20px";
+                    async function saveClick (event) {
+                        if (unsaved) {
+                            if (saving) return;
+                            saving = true;
+                            let biovalue = inputTo(bioInput.value);
+                            let account = {"username": nameInput.value, "password": passwordInput.value};
+                            let profile = {"pronouns": pronounsInput.value, "bio": biovalue};
+                            let accountresponse;
+                            let accountresult;
+                            if (accountunsaved && passwordInput.value) {
+                                if (nulled) {
+                                    account.avatar = null;
+                                } else if (avatarInput.files[0]) {
+                                    let avatarUri = await base64(avatarInput.files[0]);
+                                    account.avatar = avatarUri;
+                                }
+
+                                accountresponse = await fetch(`${base}/users/@me`, {
+                                    method: "PATCH",
+                                    headers: {
+                                        "Authorization": token,
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify(account)
+                                });
+                                accountresult = await accountresponse.json();
+                                if (accountresult.avatar) nullAvatar.style.display = "flex";
+                                else nullAvatar.style.display = "none";
+                            }
+                            let profileresponse;
+                            let profileresult;
+
+                            if (profileunsaved) {
+                                profileresponse = await fetch(`${base}/users/@me/profile`, {
+                                    method: "PATCH",
+                                    headers: {
+                                        "Authorization": token,
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify(profile)
+                                });
+                                profileresult = await profileresponse.json();
+                            }
+
+                            if ((accountresult ? (accountresult.code === 50035) : false) || (profileresult ? (profileresult.code === 50035) : false) || (!accountresult && !profileresult)) {
+                                notification([
+                                    {
+                                        content: lang.wrongPassword,
+                                        pona: !tokiponaala
+                                    }
+                                ]);
+                            } else {
+                                unsaved = false;
+                                accountunsaved = false;
+                                profileunsaved = false;
+                                event.target.parentElement.style.display = "none";
+                            }
+                            saving = false;
+                        }
+                    }
+                    save.onclick = saveClick;
+
+                    function isunsaved() {
+                        unsaved = false;
+                        saveDiv.style.display = "none";
+                        passwordInput.disabled = true;
+                        accountunsaved = false;
+                        profileunsaved = false;
+                        if (avatarInput.files[0] && !nulled) {
+                            let blob = new Blob([avatarInput.files[0]]);
+                            avatarPreview.src = URL.createObjectURL(blob);
+                            avatarPreview.style.display = "flex";
+                            nullAvatar.textContent = lang.avatarRemove;
+                            nullAvatar.onclick = nullify;
+                            nulled = false;
+                        } else {
+                            if (user.avatar && !nulled) {
+                                avatarPreview.src = currentAvatar;
+                                avatarPreview.style.display = "flex";
+                            } else {
+                                avatarPreview.src = "";
+                                avatarPreview.style.display = "none";
+                            }
+                        }
+                        if ((nameInput.value !== user.username) || (avatarInput.files[0] || nulled)) {
+                            unsaved = true;
+                            accountunsaved = true;
+                            saveDiv.style.display = "block";
+                            saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                            passwordInput.disabled = false;
+                            return;
+                        }
+                        if ((pronounsInput.value !== (user.pronouns === null ? "" : user.pronouns)) || (bioInput.value !== toInput(user.bio))) {
+                            unsaved = true;
+                            profileunsaved = true;
+                            saveDiv.style.display = "block";
+                            saveDiv.style.left = (((window.innerWidth / 2) - (saveDiv.offsetWidth / 2)).toString() + "px");
+                            return;
+                        }
+                    }
+                    nameInput.addEventListener("input", isunsaved);
+                    pronounsInput.addEventListener("input", isunsaved);
+                    bioInput.addEventListener("input", isunsaved);
+                    avatarInput.addEventListener("input", isunsaved);
+
+                    settingContent.appendChild(nameLabel);
+                    settingContent.appendChild(nameInput);
+                    settingContent.appendChild(document.createElement("br"));
+                    settingContent.appendChild(avatarLabel);
+                    settingContent.appendChild(document.createElement("br"));
+                    settingContent.appendChild(nullAvatar);
+                    settingContent.appendChild(pronounsLabel);
+                    settingContent.appendChild(pronounsInput);
+                    settingContent.appendChild(document.createElement("br"));
+                    settingContent.appendChild(bioLabel);
+                    settingContent.appendChild(bioInput);
+                    settingContent.appendChild(document.createElement("br"));
+                    settingContent.appendChild(passwordLabel);
+                    settingContent.appendChild(passwordInput);
+                };
+
+                contextmenu.appendChild(dmItem);
+                contextmenu.appendChild(mentionItem);
+
+                if (user_id === user.id) contextmenu.appendChild(settingsItem);
+
+                document.body.appendChild(contextmenu);
+            }
+
+            function close() {
+                if (!unsaved) {
+                    document.getElementById("settings").style.display = "none";
+                    document.getElementById("mainDiv").style.display = "flex";
+                }
+            }
+
+            function thebutton() {
+                let messageBox = document.getElementById("messageBox");
+            }
+
+            function toggleLang() {
+                tokiponaala = !tokiponaala;
+
+                let langButton = document.getElementById("lang");
+
+                if (tokiponaala) lang = english;
+                else lang = tokipona;
+                document.body.querySelectorAll("[key]").forEach(element => {
+                    if (tokiponaala) element.style.fontFamily = "Tinos, 'JetBrains Mono', monospace, 'nasinnanpa'";
+                    else element.style.fontFamily = "nasinnanpa";
+                    element.textContent = lang[element.getAttribute("key")];
+                });
+                document.body.querySelectorAll("[phkey]").forEach(element => {
+                    element.placeholder = lang[element.getAttribute("phkey")];
+                });
+
+                buttonDm.textContent = lang.addDm;
+                buttonMention.textContent = lang.mention;
+
+                if (tokiponaala) {
+                    langButton.style.fontFamily = "nasinnanpa";
+                    buttonDm.style.fontFamily = "unset";
+                    buttonMention.style.fontFamily = "unset";
+                } else {
+                    langButton.style.fontFamily = "unset";
+                    buttonDm.style.fontFamily = "nasinnanpa";
+                    buttonMention.style.fontFamily = "nasinnanpa";
+                }
+            }
+
+            function logout() {
+                localStorage.removeItem("token");
+                location.reload(true);
+            }
+
+            function emojiBoardOver(event) {
+                let unicode = Math.trunc(Math.random() * (0x1F64F - 0x1F600) + 0x1F600);
+                if (debug) notification([{
+                    content: unicode,
+                    pona: false
+                }]);
+                if (tokiponaala) event.target.textContent = String.fromCodePoint(unicode);
+            }
+
+            function emojiBoard(event) {
+                event.stopPropagation();
+                let board = document.getElementById("emojiBoard");
+                let search = document.getElementById("emojiSearch");
+                let list = document.getElementById("emojiList");
+                let info = document.getElementById("emojiInfo");
+
+                search.oninput = (e) => {
+                    let guilds = [];
+                    Object.values(root.users.me.guilds).forEach(g => {
+                        let emojis = g.emojis.filter(em => em.name.toLowerCase().includes(search.value.toLowerCase()));
+                        guilds.push({name: g.name, emojis: emojis});
+                    });
+                    fillBoard(guilds);
+                    if (list.innerHTML === "") info.innerHTML = "";
+                };
+                
+                let rect = event.target.getBoundingClientRect();
+                board.style.display = "flex";
+                board.style.left = rect.left + "px";
+                board.style.top = (rect.top - board.clientHeight) + "px";
+                info.innerHTML = "";
+                
+                function fillBoard(guilds) {
+                    list.innerHTML = "";
+                    for (let guild of guilds) {
+                        let guildDiv = document.createElement("div");
+                        let guildName = document.createElement("span");
+                        guildName.textContent = guild.name;
+                        guildName.innerHTML += "<br>";
+                        guildDiv.appendChild(guildName);
+                        for (let emoji of guild.emojis) {
+                            if (debug) notification([{
+                                content: JSON.stringify(emoji),
+                                pona: false
+                            }]);
+                            let emojiImg = document.createElement("img");
+                            emojiImg.src = `${cdn}/emojis/${emoji.id}.${emoji.animated ? "gif" : "png"}`;
+                            emojiImg.className = "emoji";
+                            emojiImg.onclick = (e) => {
+                                document.getElementById("message").value += `<:${emoji.name}:${emoji.id}>`;
+                            }
+                            emojiImg.onmouseover = (e) => {
+                                let bigEmojiImg = document.createElement("img");
+                                bigEmojiImg.src = `${cdn}/emojis/${emoji.id}.${emoji.animated ? "gif" : "png"}`;
+                                bigEmojiImg.style.width = "3em";
+                                bigEmojiImg.style.height = "3em";
+                                bigEmojiImg.style.maxWidth = "3em";
+                                bigEmojiImg.style.maxHeight = "3em";
+                                info.innerHTML = "";
+                                info.appendChild(bigEmojiImg);
+                                let bigEmojiName = document.createElement("span");
+                                bigEmojiName.textContent = emoji.name;
+                                bigEmojiName.style.marginLeft = "5px";
+                                info.appendChild(bigEmojiName);
+                            }
+                            guildDiv.appendChild(emojiImg);
+                        }
+                        if (guild.emojis.length) list.appendChild(guildDiv);
+                    }
+                }
+
+                fillBoard(Object.values(root.users.me.guilds));
+            }
+
+            let rememberme;
+
+            window.onload = () => {
+                if (rememberme !== undefined) return;
+
+                console.log("aaaa");
+                rememberme = false;
+
+                document.getElementById("message").addEventListener("keydown", enter);
+                document.getElementById("sendMessage").addEventListener("click", sendMessage);
+                document.getElementById("loginForm").addEventListener("submit", postlogin);
+                document.getElementById("messages").addEventListener("scroll", scroll);
+                document.getElementById("attachments").addEventListener("change", change);
+                document.getElementById("message").addEventListener("input", input);
+                document.getElementById("sendToken").addEventListener("click", startBot);
+                document.getElementById("lang").addEventListener("click", toggleLang);
+                document.getElementById("logout").addEventListener("click", logout);
+                document.getElementById("close").addEventListener("click", close);
+                document.getElementById("emojiBoardButton").addEventListener("mouseover", emojiBoardOver);
+                document.getElementById("emojiBoardButton").addEventListener("click", emojiBoard);
+                document.getElementById("channels").addEventListener("contextmenu", channelsContextMenu);
+                document.getElementById("guilds").addEventListener("contextmenu", guildsContextMenu);
+                document.getElementById("rememberme").addEventListener("input", (even) => {
+                    if (debug) notification([{
+                        content: !rememberme,
+                        pona: false
+                    }]);
+                    rememberme = !rememberme;
+                });
+
+                let localLang = localStorage.getItem("lang");
+
+                if (localLang) {
+                    if (localLang === "en") toggleLang();
+                }
+
+                let localToken = localStorage.getItem("token");
+
+                if (localToken) {
+                    start(localToken, false);
+                }
+            };
+        </script>
+        <style>
+            @font-face {
+                font-family: "nasinnanpa";
+                src: url("nasinnanpa4.0.2.otf") format("opentype");
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            :root {
+                --main-rgb: 19 20 21 !important;
+                --dpurple-rgb: 48 25 52 !important;
+                --derpurple-rgb: 40 19 43 !important;
+                --main: rgba(var(--main-rgb) / 0.5) !important;
+                --main-op: rgba(var(--main-rgb) / 0.9) !important;
+                --dpurple: rgba(var(--dpurple-rgb) / 0.9) !important;
+                --derpurple: rgba(var(--derpurple-rgb) / 0.9) !important;
+            }
+
+            #profile {
+                background: linear-gradient(
+                    45deg,
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6)),
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6))
+                );
+                position: absolute;
+                max-width: 90%;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            #notificationDiv {
+                background: linear-gradient(
+                    45deg,
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6)),
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6))
+                );
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                display: block;
+                max-width: 20vw;
+                max-height: 30vh;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+                z-index: 1006;
+            }
+
+            #emojiBoard {
+                background: linear-gradient(
+                    45deg,
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6)),
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6))
+                );
+                position: absolute;
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                width: 300px;
+                max-width: 300px;
+                height: 400px;
+                max-height: 400px;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+                z-index: 1005;
+            }
+
+            #emojiList {
+                overflow: auto;
+            }
+
+            #emojiSettings {
+                width: 300px;
+                max-width: 300px;
+                height: 400px;
+                max-height: 400px;
+                display: block;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            body {
+                background-image: url('wallpaper.jpg') !important;
+                background-size: cover !important;
+                background-repeat: no-repeat !important;
+                background-position: center !important;
+                color: #ececec;
+                font-family: "Tinos", "JetBrains Mono", monospace, "nasinnanpa";
+                max-width: 100%;
+                overflow: hidden;
+                margin: 0;
+                gap: 0;
+                padding: 0;
+            }
+
+            #loginDiv {
+                background-color: hsl(from var(--main) h s calc(l * 2));
+                padding: 5px;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            #loginDiv2 {
+                background-color: hsl(from var(--main) h s calc(l * 1));
+            }
+
+            #mainDiv {
+                background-color: hsl(from var(--main) h s calc(l * 1));
+                display: none;
+                flex-direction: row;
+                height: 100vh;
+                max-height: 100vh;
+                margin: 0;
+                padding: 0;
+                max-width: 100%;
+                gap: 6px;
+                padding: 5px;
+                overflow: hidden;
+            }
+
+            #leftDiv {
+                flex: 0 0 200px;
+                max-width: 200px;
+                overflow: auto;
+                background-color: hsl(from var(--main) h s calc(l * 1.3));
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+                padding-left: 5px;
+                padding-top: 5px;
+            }
+
+            #messages {
+                flex: 1;
+                overflow-y: scroll;
+                overflow-x: hidden;
+                display: flex;
+                max-width: 100%;
+                box-sizing: border-box;
+                flex-direction: column;
+                white-space: wrap;
+            }
+
+            #rightDiv {
+                display: flex;
+                max-width: 95%;
+                box-sizing: border-box;
+                flex-direction: column;
+                flex: 1;
+                gap: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 2));
+            }
+
+            #leftDiv > button {
+                background-color: hsl(from var(--main) h s calc(l * 1.5));
+            }
+
+            #settingContent > button {
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+            }
+
+            #message {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+                color: #ececec;
+                border: none;
+                height: 25px;
+                width: 50%;
+            }
+
+            .editInput {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+                color: #ececec;
+                border: none;
+                height: 25px;
+                width: 500px;
+            }
+
+            .guildinput {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+                color: #ececec;
+                border: none;
+                max-width: 90%;
+            }
+
+            #settings {
+                background-color: hsl(from var(--main) h s calc(l * 1));
+                position: absolute;
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                max-height: 100%;
+                top: 0;
+                left: 0;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                z-index: 3;
+            }
+
+            #settings2 {
+                background-color: hsl(from var(--main) h s calc(l * 2));
+                width: 100%;
+                max-width: 100%;
+                height: 100%;
+                max-height: 100%;
+                padding: 10px;
+            }
+
+            .messageRight {
+                padding-left: 5px;
+                margin-bottom: auto;
+            }
+
+            .messageElement {
+                margin-top: 15px;
+                white-space: wrap;
+            }
+
+            .messageContent {
+                white-space: wrap;
+            }
+
+            .messageContent p,
+            .messageContent h1,
+            .messageContent h2,
+            .messageContent h3,
+            .messageContent ul,
+            .messageContent ol,
+            .messageContent blockquote,
+            .messageContent pre {
+                margin: 0;
+                padding: 0;
+            }
+
+            .messageBody {
+                display: flex;
+            }
+
+            #imagePopup {
+                background: #636363;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                display: none;
+                justify-content: center;
+                align-items: center;
+
+                width: 80vw;
+                height: 80vh;
+                max-width: 100vw;
+                max-height: 100vh;
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            #imagePopup img {
+                background-size: contain;
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                background-color: transparent;
+                background-position: center center;
+                display: flex;
+            }
+
+            #contextmenu {
+                background: #1C1E21;
+                position: absolute;
+                max-width: 90%;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                z-index: 5;
+            }
+
+            .item {
+                width: 100%;
+                max-width: 100%;
+                padding: 5px;
+            }
+
+            .notification {
+                max-width: 20vw;
+                max-height: 20vh;
+                word-break: break-word;
+            }
+
+            button {
+                font-family: "nasinnanpa";
+                background-color: hsl(from var(--main) h s calc(l * 1.5));
+                color: #ececec;
+                border: none;
+                padding-top: 4px;
+            }
+
+            .messageElement {
+                width: 100%;
+                max-width: 100%;
+                word-break: break-word;
+            }
+
+            #ilopisitelenpona {
+                display: none;
+            }
+
+            #mobile {
+                display: none;
+            }
+
+            #attachments {
+                display: none;
+            }
+
+            #fileLabel {
+                font-family: "nasinnanpa";
+            }
+
+            #fileSpan {
+                font-family: "nasinnanpa";
+            }
+
+            #fileEnd {
+                font-family: "nasinnanpa";
+            }
+
+            .day {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                max-width: 90%;
+                font-size: 20px;
+                padding-top: 25px;
+                padding-bottom: 25px;
+            }
+
+            #typing {
+                font-family: "nasinnanpa";
+            }
+
+            .replyElement {
+                word-break: break-word;
+            }
+
+            #profileBio {
+                word-break: break-word;
+            }
+
+            #profileUsername {
+                word-break: break-word;
+            }
+
+            .editInput:focus {
+                outline: none;
+            }
+
+            .guildinput:focus {
+                outline: none;
+            }
+
+            #message:focus {
+                outline: none;
+            }
+
+            #pokipipanatokipona {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+                color: #ececec;
+                border: none;
+                height: 25px;
+            }
+
+            #pokipipanatokipona:focus {
+                outline: none;
+            }
+
+            #ilopisitelenpona {
+                margin-top: 6px;
+            }
+
+            .avatar {
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
+            }
+
+            #profileText {
+                padding-left: 10px;
+                padding-right: 10px;
+                padding-bottom: 10px;
+            }
+
+            #profileBio {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .settingsInput {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: #2C2F33;
+                color: #ececec;
+                border: none;
+                max-width: 90%;
+            }
+
+            .settingsInput:focus {
+                outline: none;
+            }
+
+            #saveDiv {
+                position: absolute;
+                display: none;
+                bottom: 10;
+                left: 50%;
+                z-index: 4;
+            }
+
+            #save {
+                background-color: #008000;
+                border-radius: 15px;
+            }
+
+            #close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+            }
+
+            #channels {
+                width: 100%;
+            }
+
+            #guilds {
+                width: 100%;
+            }
+
+            .read {
+                color: #9ea1a3;
+            }
+
+            .unread {
+                color: #ececec;
+            }
+
+            #thebutton {
+                position: absolute;
+                top: 0;
+            }
+
+            .emoji {
+                height: 1.375em;
+                max-height: 1.375em;
+                width: 1.375em;
+                max-width: 1.375em;
+                vertical-align: -0.2em;
+            }
+
+            .emoji-only .emoji {
+                height: 3em;
+                max-height: 3em;
+                width: 3em;
+                max-width: 3em;
+            }
+
+            .emoji-only {
+                padding: 0;
+                margin: 0;
+                gap: 0;
+            }
+
+            #reply {
+            }
+
+            .inviteDiv {
+                background: linear-gradient(
+                    45deg,
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6)),
+                    hsl(from var(--dpurple) h s calc(l * 0.6)),
+                    hsl(from var(--derpurple) h s calc(l * 0.6))
+                );
+                padding: 15px;
+                max-width: 300px;
+
+                box-sizing: border-box;
+                border-radius: 10px;
+                overflow: hidden;
+            }
+
+            .inviteContent {
+                margin-top: 20px;
+            }
+
+            .inviteImg {
+                height: 50px;
+                max-height: 50px;
+                width: 50px;
+                max-width: 50px;
+                border-radius: 50%;
+                aspect-ratio: 1 / 1;
+            }
+
+            #emojiInfo {
+                padding: 5px;
+            }
+
+            #emojiSearchDiv {
+                padding: 5px;
+            }
+
+            #emojiSearch {
+                box-sizing: border-box;
+                border-radius: 6px;
+                background-color: hsl(from var(--main) h s calc(l * 1.7));
+                color: #ececec;
+                border: none;
+                max-width: 90%;
+            }
+
+            #emojiSearch:focus {
+                outline: none;
+            }
+
+            @media (max-width: 600px) {
+                #mobile {
+                    display: block;
+                    position: fixed;
+                    top: 10px;
+                    left: 10px;
+                    z-index: 2;
+                }
+
+                #leftDiv {
+                    display: none;
+                }
+
+                #leftDiv.show {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 5px;
+                    padding-left: 5px;
+                    padding-top: 5px;
+                    position: fixed;
+                    width: 200px;
+                    height: 99vh;
+                    z-index: 1;
+                    background: linear-gradient(
+                        45deg,
+                        hsl(from var(--dpurple) h s calc(l * 0.6)),
+                        hsl(from var(--derpurple) h s calc(l * 0.6)),
+                        hsl(from var(--dpurple) h s calc(l * 0.6)),
+                        hsl(from var(--derpurple) h s calc(l * 0.6))
+                    );
+                    box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+                    overflow: auto;
+                }
+
+                #mobile.slide {
+                    transform: translateX(200px);
+                }
+
+                #mainDiv {
+                    flex-direction: row;
+                }
+
+                #rightDiv {
+                    flex: 1;
+                    margin-left: 0;
+                    max-width: 100%;
+                }
+
+                #messages {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="loginDiv2">
+            <div id="loginDiv">
+                <form id="loginForm">
+                    <input id="login" phkey="login" placeholder="nimi sina" type="email" name="email" autocomplete="off" required>
+                    <input id="password" phkey="password" placeholder="sina taso sona e nimi ni" type="password" name="password" autocomplete="current-password" required>
+                    <button id="postLogin" key="postLogin" type="submit">o pana e nimi sina</button>
+                    <br>
+                    <span key="rememberme" style="font-family: 'nasinnanpa'">tenpo kama la o sona e mi</span>
+                    <input id="rememberme" type="checkbox">
+                </form>
+                <input id="token" phkey="token" placeholder="nimi pi ilo jan">
+                <button id="sendToken" key="sendToken">o pana e nimi pi ilo jan</button>
+                <button id="lang" key="lang" style="font-family: ''">english</button>
+            </div>
+        </div>
+
+        <div id="mainDiv">
+            <button id="mobile" key="mobile" onclick="forceLeftDiv()">kulupu</button>
+            <div id="leftDiv">
+                <div id="guilds">
+                </div>
+
+                <button id="showPms" key="showPms" onclick="showPms()">kulupu toki pi jan tu</button>
+
+                <div id="channels">
+                </div>
+                <button id="logout" key="logout">o tawa</button>
+            </div>
+
+            <div id="rightDiv">
+                <div id="messages">
+
+                </div>
+
+                <div>
+                    <span id="reply" onclick="clearReply()"></span>
+                    <p>
+                        <input id="message" contenteditable="true" phkey="message" placeholder="o toki" autocomplete="off">
+                        <button id="emojiBoardButton" key="emojiBoard">sitelen lili</button>
+                        <button type="submit" id="sendMessage" key="sendMessage">o pana e toki</button>
+                        <label>
+                            <input id="attachments" type="file" multiple>
+                            <span id="fileSpan" key="file">o pana e lipu</span>
+                            <span id="fileName"></span>
+                            <span id="fileEnd"></span>
+                        </label>
+                    </p>
+                    <span id="typing"></span>
+                    <button onclick="oanteeilopisitelenpona()">sitelen pona</button>
+                    <div id="ilopisitelenpona">
+                        <input id="pokipipanatokipona" placeholder="o toki pona">
+                        <button onclick="opanasitelenpona()">o pana</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="imagePopup"></div>
+
+        <div id="notificationDiv"></div>
+
+        <div id="settings">
+            <div id="settings2">
+                <div id="settingContent">
+
+                </div>
+            </div>
+
+            <button id="close" key="close">
+                o tawa
+            </button>
+
+            <div id="saveDiv">
+                <button id="save" key="save">
+                    o pana e ante
+                </button>
+            </div>
+        </div>
+
+        <div id="emojiBoard">
+            <div id="emojiSearchDiv">
+                <input id="emojiSearch" phkey="emojiSearch" autocomplete="off" placeholder="nimi la o kipisi e sitelen lili">
+            </div>
+            <div id="emojiList">
+
+            </div>
+            <span id="emojiInfo"></span>
+        </div>
+
+        <button id="thebutton" onclick="thebutton()" style="display:none"></button>
+
+        <div id="messageBox"></div>
+
+        <script>
+            rememberme = false;
+
+            document.getElementById("message").addEventListener("keydown", enter);
+            document.getElementById("sendMessage").addEventListener("click", sendMessage);
+            document.getElementById("loginForm").addEventListener("submit", postlogin);
+            document.getElementById("messages").addEventListener("scroll", scroll);
+            document.getElementById("attachments").addEventListener("change", change);
+            document.getElementById("message").addEventListener("input", input);
+            document.getElementById("message").addEventListener("paste", paste);
+            document.getElementById("sendToken").addEventListener("click", startBot);
+            document.getElementById("lang").addEventListener("click", toggleLang);
+            document.getElementById("logout").addEventListener("click", logout);
+            document.getElementById("close").addEventListener("click", close);
+            document.getElementById("emojiBoardButton").addEventListener("mouseover", emojiBoardOver);
+            document.getElementById("emojiBoardButton").addEventListener("click", emojiBoard);
+            document.getElementById("channels").addEventListener("contextmenu", channelsContextMenu);
+            document.getElementById("guilds").addEventListener("contextmenu", guildsContextMenu);
+            document.getElementById("rememberme").addEventListener("input", (even) => {
+                if (debug) notification([{
+                    content: !rememberme,
+                    pona: false
+                }]);
+                rememberme = !rememberme;
+            });
+
+            let localLang = localStorage.getItem("lang");
+
+            if (localLang) {
+                if (localLang === "en") toggleLang();
+            }
+
+            let localToken = localStorage.getItem("token");
+
+            if (localToken) {
+                start(localToken, false);
+            }
+        </script>
+    </body>
+</html>
