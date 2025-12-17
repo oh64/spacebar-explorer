@@ -57,15 +57,29 @@ export async function GET(request) {
     }
 
     const filename = path.basename(downloadUrl);
-    const versionsDir = path.resolve(process.cwd(), 'src/static/clients', clientKey, 'versions');
-    const filePath = path.join(versionsDir, filename);
+    
+    if (filename !== downloadUrl || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+      return jsonWithStatus({ error: 'invalid filename' }, 400);
+    }
 
-    if (!filePath.startsWith(versionsDir)) {
-      return jsonWithStatus({ error: 'invalid path' }, 400);
+    const versionsDir = path.resolve(process.cwd(), 'src/static/clients', clientKey, 'versions');
+    const filePath = path.resolve(versionsDir, filename);
+
+
+    const normalizedVersionsDir = path.resolve(versionsDir);
+    const normalizedFilePath = path.resolve(filePath);
+    
+    if (!normalizedFilePath.startsWith(normalizedVersionsDir + path.sep) && normalizedFilePath !== normalizedVersionsDir) {
+      return jsonWithStatus({ error: 'path traversal detected' }, 403);
     }
 
     if (!fs.existsSync(filePath)) {
       return jsonWithStatus({ error: 'file not found' }, 404);
+    }
+
+    const stats = fs.statSync(filePath);
+    if (!stats.isFile()) {
+      return jsonWithStatus({ error: 'not a file' }, 400);
     }
 
     const data = fs.readFileSync(filePath);
