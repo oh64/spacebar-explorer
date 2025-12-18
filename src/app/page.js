@@ -2,7 +2,7 @@
 
 import "./app.css";
 import { useState, useEffect, useMemo } from "react";
-import { loadClients, loadInstances, loadGuilds } from "../utils/itemLoaders";
+import { loadClients, loadBots, loadInstances, loadGuilds } from "../utils/itemLoaders";
 import { copyToClipboard } from "../utils/clipboard";
 import { useImageGallery } from "../hooks/useImageGallery";
 import { useFilters } from "../hooks/useFilters";
@@ -16,16 +16,19 @@ import ItemModal from "../components/ItemModal";
 const TABS = [
   { id: 'clients', label: 'Clients' },
   { id: 'instances', label: 'Instances' },
-  { id: 'guilds', label: 'Guilds' }
+  { id: 'guilds', label: 'Guilds' },
+  { id: 'bots', label: 'Bots' }
 ];
 
 
 export default function Home() {
   const [clients] = useState(loadClients());
+  const [bots] = useState(loadBots());
   const [instances] = useState(loadInstances());
   const [guilds] = useState(loadGuilds());
   const [activeTab, setActiveTab] = useState("clients");
   const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedBot, setSelectedBot] = useState(null);
   const [selectedInstance, setSelectedInstance] = useState(null);
   const [selectedGuild, setSelectedGuild] = useState(null);
   const [copiedText, setCopiedText] = useState(null);
@@ -33,7 +36,7 @@ export default function Home() {
   
 
   const filters = useFilters();
-  const selectedItem = selectedClient || selectedInstance || selectedGuild;
+  const selectedItem = selectedClient || selectedBot || selectedInstance || selectedGuild;
   const imageGallery = useImageGallery(selectedItem);
 
   useEffect(() => {
@@ -51,6 +54,14 @@ export default function Home() {
 
   function openClient(clientObj) {
     setSelectedClient(clientObj);
+    setSelectedBot(null);
+    setSelectedInstance(null);
+    setSelectedGuild(null);
+  }
+
+  function openBot(botObj) {
+    setSelectedBot(botObj);
+    setSelectedClient(null);
     setSelectedInstance(null);
     setSelectedGuild(null);
   }
@@ -58,17 +69,20 @@ export default function Home() {
   function openInstance(instanceObj) {
     setSelectedInstance(instanceObj);
     setSelectedClient(null);
+    setSelectedBot(null);
     setSelectedGuild(null);
   }
 
   function openGuild(guildObj) {
     setSelectedGuild(guildObj);
     setSelectedClient(null);
+    setSelectedBot(null);
     setSelectedInstance(null);
   }
 
   function closeModal() {
     setSelectedClient(null);
+    setSelectedBot(null);
     setSelectedInstance(null);
     setSelectedGuild(null);
   }
@@ -80,12 +94,13 @@ export default function Home() {
     if (disallowed) return;
     
     if (type === 'client') openClient(item);
+    else if (type === 'bot') openBot(item);
     else if (type === 'instance') openInstance(item);
     else if (type === 'guild') openGuild(item);
   }
 
-  const activeItems = activeTab === 'clients' ? clients : activeTab === 'instances' ? instances : guilds;
-  const isClientTab = activeTab === 'clients';
+  const activeItems = activeTab === 'clients' ? clients : activeTab === 'instances' ? instances : activeTab === 'guilds' ? guilds : bots;
+  const isClientTab = activeTab === 'clients' || activeTab === 'bots';
   const filteredItems = useMemo(() => {
     return filters.filterAndSort(activeItems, isClientTab);
   }, [activeItems, isClientTab, filters.searchQuery, filters.statusFilter, filters.selectedIncludeTags, filters.selectedExcludeTags, filters.itemSort]);
@@ -130,7 +145,8 @@ export default function Home() {
               transform: 
                 activeTab === "clients" ? "translateX(0%)" : 
                 activeTab === "instances" ? "translateX(-100%)" : 
-                "translateX(-200%)",
+                activeTab === "guilds" ? "translateX(-200%)" : 
+                "translateX(-300%)",
             }}
           >
             {/* Clients */}
@@ -180,13 +196,29 @@ export default function Home() {
                 ))}
               </ul>
             </div>
+
+            {/* Bots */}
+            <div className="min-w-full">
+              <ul className="w-full space-y-4">
+                {activeTab === 'bots' && filteredItems.map((item, index) => (
+                  <ItemCard
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    type="bot"
+                    onCardClick={(e) => handleCardClick(e, item, 'bot')}
+                    onViewDetails={openBot}
+                  />
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
       <div className="w-full max-w-[75em] mt-6 mb-12 p-4 rounded-lg bg-[#071227]/60 border border-[#1f2937] text-sm text-[#cfcfe0]">
         <div>
-          To suggest additional clients, instances, or guilds, please open an issue on GitHub:
+          To suggest additional clients, bots, instances, or guilds, please open an issue on GitHub:
           <a 
             href={`${(process.env.NEXT_PUBLIC_REPO_URL || 'https://github.com/oh64/spacebar-explorer').replace(/\/$/, '')}/issues`} 
             target="_blank" 
@@ -201,7 +233,7 @@ export default function Home() {
       {selectedItem && (
         <ItemModal
           item={selectedItem}
-          type={selectedClient ? 'client' : selectedGuild ? 'guild' : 'instance'}
+          type={selectedClient ? 'client' : selectedBot ? 'bot' : selectedGuild ? 'guild' : 'instance'}
           onClose={closeModal}
           selectedInstance={selectedInstance}
           copiedText={copiedText}

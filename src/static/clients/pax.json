@@ -6,7 +6,7 @@
   "maintainer_image": "/static/pax/Sylvie-avatar.jpeg",
   "tags": ["open-source", "web", "impressive", "lightweight"],
   "short": "Pax is an extremely lightweight Spacebar client designed to work on old browsers and controlled environments",
-  "description": "Pax is an extremely lightweight Spacebar client designed to work on old browsers and controlled environments. It's currently in development, born in November 2025, and takes the form of a single HTML file of ~180 Ko that can be locally stored anywhere and opened in a browser without any hosting setup. This also allows Pax to bypass parental controls such as Google Family Link.",
+  "description": "Pax is an extremely lightweight Spacebar client designed to work on old browsers and controlled environments. It's currently in development, born in November 2025, and takes the form of a single HTML file of ~190 Ko that can be locally stored anywhere and opened in a browser without any hosting setup. This also allows Pax to bypass parental controls such as Google Family Link.",
   "icon": "/static/pax/pax-icon.jpg",
   "images": [
     "/static/pax/1.png",

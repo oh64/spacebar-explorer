@@ -9,7 +9,6 @@ export default function VersionsPanel({ item }) {
   const changelogLink = versionsObj.changelog_link || '';
   const allKeys = Object.keys(versionsObj || {}).filter(k => k !== 'changelog_link');
   
-  // Show the panel if there's a changelog link OR version entries
   if (!changelogLink && (!allKeys || allKeys.length === 0)) return null;
 
   const latestKey = allKeys[0];
