@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm';
 import ImageGallery from './ImageGallery';
 import AccessPanel from './AccessPanel';
 import VersionsPanel from './VersionsPanel';
+import { imageWithHash } from '../utils/imageHelpers';
 
 export default function ItemModal({ 
   item, 
@@ -329,7 +330,7 @@ export default function ItemModal({
           <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6">
             <div className="flex items-start gap-4">
               {item.icon && (
-             <img src={item.icon} alt={item.name || 'icon'} loading="lazy" decoding="async" className="h-16 w-16 rounded-xl object-cover shadow-lg ring-2 ring-purple-500/30" />
+             <img src={imageWithHash(item.icon)} alt={item.name || 'icon'} loading="lazy" decoding="async" className="h-16 w-16 rounded-xl object-cover shadow-lg ring-2 ring-purple-500/30" />
               )}
               <div>
                 <h3 className="text-2xl sm:text-3xl font-bold text-white mb-1">{item.name}</h3>
@@ -346,7 +347,7 @@ export default function ItemModal({
                       <a href={item.maintainer_link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-3 text-sm text-[#cfcfe0] hover:underline">
                         {item.maintainer_image && showMaintainerImage ? (
                           <img
-                            src={item.maintainer_image}
+                            src={imageWithHash(item.maintainer_image)}
                             alt={item.maintainer}
                             className="h-8 w-8 rounded-full object-cover shadow-sm ring-1 ring-white/10"
                             onError={() => setShowMaintainerImage(false)}
@@ -360,7 +361,7 @@ export default function ItemModal({
                       <div className="inline-flex items-center gap-3 text-sm text-[#cfcfe0]">
                         {item.maintainer_image && showMaintainerImage ? (
                           <img
-                            src={item.maintainer_image}
+                            src={imageWithHash(item.maintainer_image)}
                             alt={item.maintainer}
                             className="h-8 w-8 rounded-full object-cover shadow-sm ring-1 ring-white/10"
                             onError={() => setShowMaintainerImage(false)}

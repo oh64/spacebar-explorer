@@ -1,4 +1,5 @@
 import { highlightClassFor, backgroundClassFor } from '../utils/classHelpers';
+import { imageWithHash } from '../utils/imageHelpers';
 import StatusButton from './StatusButton';
 
 export default function ItemCard({ 
@@ -23,7 +24,7 @@ export default function ItemCard({
       <div className="flex items-center gap-4 w-full md:w-auto">
         {safeIcon ? (
           <img 
-            src={safeIcon} 
+            src={imageWithHash(safeIcon)} 
             alt={safeName} 
             loading="lazy"
             decoding="async"

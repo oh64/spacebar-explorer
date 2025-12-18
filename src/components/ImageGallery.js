@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { imageWithHash } from '../utils/imageHelpers';
 
 export default function ImageGallery({ 
   item, 
@@ -44,7 +45,7 @@ export default function ImageGallery({
           }}
         >
           <img 
-            src={item.images[currentImageIndex]} 
+            src={imageWithHash(item.images[currentImageIndex])} 
             alt={`${item.name} screenshot ${currentImageIndex + 1}`}
             className="w-full h-full object-contain pointer-events-none"
             onError={(e) => { 
@@ -64,7 +65,7 @@ export default function ImageGallery({
               <span className="text-2xl leading-none">×</span>
             </button>
             <div className="relative max-w-[95%] max-h-[95%]">
-              <img src={item.images[currentImageIndex]} alt={`expanded ${item.name}`} className="max-w-full max-h-[90vh] object-contain rounded" onClick={(e) => e.stopPropagation()} />
+              <img src={imageWithHash(item.images[currentImageIndex])} alt={`expanded ${item.name}`} className="max-w-full max-h-[90vh] object-contain rounded" onClick={(e) => e.stopPropagation()} />
             </div>
           </div>
         )}
